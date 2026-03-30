@@ -1,0 +1,86 @@
+# Architecture Decision Records
+
+## ADR-001: Hosting — Cloudflare Pages via OpenNext
+**Status:** Accepted
+
+Next.js deployed to Cloudflare Pages using [OpenNext](https://opennext.js.org/cloudflare) (broader Next.js feature support vs `@cloudflare/next-on-pages`).
+
+---
+
+## ADR-002: Authentication — Neon Auth
+**Status:** Accepted
+
+[Neon Auth](https://neon.com/docs/auth/overview) (built on Stack Auth) for authentication. Signups are restricted to a configurable allowlist of email addresses stored as a Cloudflare secret.
+
+---
+
+## ADR-003: Database — Neon Postgres
+**Status:** Accepted
+
+Neon Postgres for all persistent storage. Chosen because Neon Auth already requires a Neon project, so there is no additional infrastructure cost.
+
+---
+
+## ADR-004: AI Abstraction — Vercel AI SDK
+**Status:** Accepted
+
+The [Vercel AI SDK](https://sdk.vercel.ai) provides a model-agnostic interface over Claude, OpenAI, Google, and others. All AI interactions go through a thin provider abstraction so the underlying model can be swapped or A/B tested without changing application logic.
+
+---
+
+## ADR-005: Exercise Videos — YouTube Embeds (AI-supplied video IDs)
+**Status:** Accepted
+
+The AI supplies a YouTube video ID when it creates a new exercise. Videos are embedded via the standard YouTube iframe embed. Video IDs can be manually corrected in the database if the AI-supplied ID is wrong or becomes unavailable. No YouTube Data API key required.
+
+---
+
+## ADR-006: Mobile — Progressive Web App (PWA)
+**Status:** Accepted
+
+A PWA rather than a native app. No offline support required. The UI must be fully usable on a phone.
+
+---
+
+## ADR-010: Agent Context Management — Tessl
+**Status:** Accepted
+
+[Tessl](https://tessl.io) manages agent rules and skills for this project. Skills from the [Tessl Registry](https://tessl.io/registry) are installed into the repo and automatically loaded by coding agents (Claude Code, Cursor, etc.), providing accurate context for the libraries and frameworks in use and preventing hallucinated APIs and bad patterns.
+
+Skills are installed via:
+```bash
+npx tessl install <skill-name>
+```
+
+We will install registry skills for each major dependency (Next.js, Cloudflare Workers, Neon, Vercel AI SDK, Drizzle, shadcn/ui, etc.) and may publish private org-level skills to encode Cloudflare Workers constraints and internal patterns as they are discovered.
+
+The Tessl Framework (spec-driven development, currently in beta) may be adopted later to define features in structured specs before coding begins.
+
+---
+
+## ADR-009: UI — Tailwind CSS + shadcn/ui
+**Status:** Accepted
+
+[Tailwind CSS](https://tailwindcss.com) for styling and [shadcn/ui](https://ui.shadcn.com) for components. shadcn/ui components are copied directly into the repo (not installed as a package dependency), making them fully customizable. Tailwind is the required styling layer for shadcn/ui.
+
+---
+
+## ADR-008: Neon Database Branching Strategy
+**Status:** Accepted
+
+Neon branches map to deployment environments:
+
+| Environment | Neon Branch | Cloudflare Deployment |
+|---|---|---|
+| Production | `main` | Pages production |
+| Preview | `preview/[git-branch]` (auto-created) | Pages preview |
+| Local | `dev/[your-name]` (manually created) | n/a |
+
+Preview branches are created and deleted automatically via the [Neon GitHub integration](https://neon.com/docs/guides/neon-github-integration). Each preview deployment on Cloudflare Pages receives its own `DATABASE_URL` pointing to the corresponding Neon branch, set via a GitHub Actions step that calls the Cloudflare API. This ensures preview deployments never touch production data.
+
+---
+
+## ADR-007: Exercise Database — AI-generated at runtime
+**Status:** Accepted
+
+There is no pre-seeded exercise library. The AI generates exercises (name, description, YouTube video ID, default parameters) as it builds workout plans. Generated exercises are persisted to Neon so they can be reused and refined.
