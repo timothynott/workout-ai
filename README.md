@@ -13,9 +13,40 @@ An AI-powered workout app inspired by Freeletics. Generates personalized workout
 ### Prerequisites
 - [Neon](https://neon.tech) account
 - [Cloudflare](https://cloudflare.com) account with Pages enabled
+- [Tessl](https://tessl.io) account (free) for agent skill management
 - GitHub repository (required for Neon branch automation)
 
-### 1. Neon Setup
+### 1. Tessl Setup
+
+Tessl manages agent skills that give AI coding tools accurate context for the libraries in this project.
+
+```bash
+# Authenticate with the Tessl registry
+npx tessl auth login
+
+# Init Tessl in the project
+# Optionally configure MCP for your agent (claude-code, cursor, copilot, codex, etc.)
+npx tessl init --agent <your-agent>
+
+# Install skills for the full stack
+npx tessl install github/jeffallan/claude-skills/nextjs-developer
+npx tessl install github/secondsky/claude-skills/workers-frameworks
+npx tessl install github/jezweb/claude-skills/neon-vercel-postgres
+npx tessl install github/mindrally/skills/drizzle-orm
+npx tessl install github/jezweb/claude-skills/ai-sdk-ui
+npx tessl install github/jezweb/claude-skills/tailwind-v4-shadcn
+```
+
+**GitHub Actions:** Add a `TESSL_TOKEN` secret to the repository (obtained via `npx tessl auth token`) and include the following step in CI workflows so agents running in CI have the same skill context:
+
+```yaml
+- name: Install Tessl skills
+  run: npx tessl install --yes
+  env:
+    TESSL_TOKEN: ${{ secrets.TESSL_TOKEN }}
+```
+
+### 2. Neon Setup
 
 1. Create a new Neon project at [console.neon.tech](https://console.neon.tech).
 2. The default branch (`main`) is your production database.
@@ -44,7 +75,7 @@ Add the following GitHub Actions step to your preview deployment workflow to for
       --data '{"DATABASE_URL": "${{ env.DATABASE_URL }}"}'
 ```
 
-### 2. Neon Auth Setup
+### 3. Neon Auth Setup
 
 1. In the Neon console, enable **Auth** for your project.
 2. Note the Auth URL and API keys.
@@ -52,7 +83,7 @@ Add the following GitHub Actions step to your preview deployment workflow to for
    - `NEON_AUTH_URL`
    - `NEON_AUTH_SECRET`
 
-### 3. Cloudflare Pages Setup
+### 4. Cloudflare Pages Setup
 
 1. Connect your GitHub repository to Cloudflare Pages.
 2. Set the build command: `npm run build` (OpenNext handles the Cloudflare adapter).
@@ -66,7 +97,7 @@ Add the following GitHub Actions step to your preview deployment workflow to for
    - `AI_API_KEY` — API key for the chosen provider
    - `ALLOWED_EMAILS` — comma-separated list of permitted signup emails
 
-### 4. Local Development
+### 5. Local Development
 
 Copy `.env.example` to `.env.local` and fill in values:
 

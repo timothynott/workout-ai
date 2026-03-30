@@ -1,7 +1,10 @@
 # Build Checklist
 
 ## Phase 1 — Project Scaffold
-- [ ] Install Tessl skills for the full stack (Next.js, Cloudflare Workers, Neon, Drizzle, Vercel AI SDK, shadcn/ui, Tailwind)
+- [ ] Authenticate with Tessl (`npx tessl auth login`)
+- [ ] Init Tessl in project (`npx tessl init --agent <your-agent>`)
+- [ ] Install Tessl skills for the full stack (Next.js, Cloudflare Workers, Neon, Drizzle, Vercel AI SDK, Tailwind+shadcn)
+- [ ] Add `TESSL_TOKEN` secret to GitHub repository for CI
 - [ ] Initialize Next.js app (`create-next-app`, App Router, TypeScript)
 - [ ] Configure OpenNext for Cloudflare Pages deployment
 - [ ] Set up Neon Postgres project and `main` branch (production)
