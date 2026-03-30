@@ -1,0 +1,11 @@
+{
+  "name": "tessl-labs/drizzle-best-practices",
+  "version": "0.2.2",
+  "summary": "Drizzle ORM patterns -- schema definition, indexes, relations, migrations, transactions, upserts, prepared statements, and connection setup",
+  "skills": {
+    "drizzle-best-practices": {
+      "path": "skills/drizzle-best-practices/SKILL.md"
+    }
+  },
+  "private": false
+}

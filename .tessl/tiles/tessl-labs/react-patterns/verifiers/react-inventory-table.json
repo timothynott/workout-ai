@@ -1,0 +1,54 @@
+{
+  "instruction": "Build an inventory table with sorting and filtering",
+  "relevant_when": "Agent builds React components with lists, tables, filtering, or sorting",
+  "context": "Proactively check that agents apply memoization, key props, and derived state patterns correctly.",
+  "sources": [
+    {
+      "type": "file",
+      "filename": "skills/react-patterns/SKILL.md",
+      "tile": "tessl-labs/react-patterns"
+    }
+  ],
+  "checklist": [
+    {
+      "name": "row-component-memoized",
+      "rule": "The individual row component is wrapped in React.memo to prevent unnecessary re-renders when the parent re-renders due to filter/sort changes",
+      "relevant_when": "Agent builds a table or list with a child row component that receives props from a parent"
+    },
+    {
+      "name": "callback-stabilized-with-usecallback",
+      "rule": "Callback functions passed as props to the React.memo row component are stabilized with useCallback",
+      "relevant_when": "Agent passes callback props to a memoized child component"
+    },
+    {
+      "name": "filtered-sorted-data-memoized",
+      "rule": "The filtered and/or sorted data is computed with useMemo (or computed during render without useEffect), not stored in a separate useState updated via useEffect",
+      "relevant_when": "Agent filters or sorts a list based on user input"
+    },
+    {
+      "name": "no-useeffect-for-derived-state",
+      "rule": "Agent does NOT use useEffect to update state that could be computed from existing state (e.g. filtered list, totals, counts). Uses useMemo or direct computation instead.",
+      "relevant_when": "Agent computes derived values from state"
+    },
+    {
+      "name": "stable-keys-on-rows",
+      "rule": "Table/list rows use a stable unique identifier (e.g. item.id) as the key prop, not the array index",
+      "relevant_when": "Agent renders a list of items with .map()"
+    },
+    {
+      "name": "no-inline-objects-to-memo-children",
+      "rule": "No inline object or array literals are passed as props to React.memo children (which would defeat memoization)",
+      "relevant_when": "Agent passes object props to memoized children"
+    },
+    {
+      "name": "typescript-interfaces",
+      "rule": "Props and data types are defined with TypeScript interfaces, not using 'any'",
+      "relevant_when": "Agent writes React components with TypeScript"
+    },
+    {
+      "name": "aria-live-on-result-count",
+      "rule": "The result count or filter summary region uses aria-live=\"polite\" so screen readers announce changes when the user filters",
+      "relevant_when": "Agent displays a dynamic count of filtered results"
+    }
+  ]
+}

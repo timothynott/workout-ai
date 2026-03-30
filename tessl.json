@@ -1,5 +1,39 @@
 {
   "name": "workout-ai",
   "mode": "vendored",
-  "dependencies": {}
+  "dependencies": {
+    "cloudflare/skills": {
+      "version": "ed57ea9dcb5d520f6ed055d3b1418993ed1ae593",
+      "source": "https://github.com/cloudflare/skills",
+      "include": {
+        "skills": [
+          "cloudflare"
+        ]
+      }
+    },
+    "tessl-labs/drizzle-best-practices": {
+      "version": "0.2.2"
+    },
+    "vercel/ai": {
+      "version": "bee7932e36eb551374afb93ec5881dae11d0604f",
+      "source": "https://github.com/vercel/ai",
+      "include": {
+        "skills": [
+          "ai-sdk"
+        ]
+      }
+    },
+    "shadcn-ui/ui": {
+      "version": "d3de6aa760126144b848e3d69c6b191a7463695e",
+      "source": "https://github.com/shadcn-ui/ui",
+      "include": {
+        "skills": [
+          "shadcn"
+        ]
+      }
+    },
+    "tessl-labs/react-patterns": {
+      "version": "0.2.0"
+    }
+  }
 }

@@ -1,0 +1,64 @@
+{
+  "instruction": "Configure drizzle-kit correctly and use current migration commands",
+  "relevant_when": "Agent sets up drizzle-kit configuration or writes migration commands",
+  "context": "drizzle.config.ts must use 'dialect' (not the removed 'driver' field) and defineConfig() from 'drizzle-kit'. Migration commands are 'npx drizzle-kit generate' and 'npx drizzle-kit migrate' -- the old ':dialect' suffix syntax (generate:sqlite, push:postgresql) was removed. The config needs schema path, out directory, dialect, and dbCredentials. Migration files must be committed to git. Pass { schema } to drizzle() to enable the query API. SQLite requires foreign_keys=ON pragma.",
+  "sources": [
+    {
+      "type": "file",
+      "filename": "skills/drizzle-best-practices/SKILL.md",
+      "tile": "tessl-labs/drizzle-best-practices@0.2.0"
+    }
+  ],
+  "checklist": [
+    {
+      "name": "dialect-not-driver",
+      "rule": "drizzle.config.ts uses the 'dialect' field ('sqlite' | 'postgresql' | 'mysql'), not the removed 'driver' field",
+      "relevant_when": "Agent creates or modifies drizzle.config.ts"
+    },
+    {
+      "name": "define-config-used",
+      "rule": "drizzle.config.ts imports and uses defineConfig() from 'drizzle-kit' for type-safe configuration",
+      "relevant_when": "Agent creates drizzle.config.ts"
+    },
+    {
+      "name": "schema-path-configured",
+      "rule": "drizzle.config.ts sets the 'schema' field pointing to the schema file (e.g., './src/db/schema.ts')",
+      "relevant_when": "Agent creates drizzle.config.ts"
+    },
+    {
+      "name": "out-directory-configured",
+      "rule": "drizzle.config.ts sets the 'out' field for migration output directory (e.g., './drizzle')",
+      "relevant_when": "Agent creates drizzle.config.ts"
+    },
+    {
+      "name": "db-credentials-configured",
+      "rule": "drizzle.config.ts includes a dbCredentials object with connection info",
+      "relevant_when": "Agent creates drizzle.config.ts"
+    },
+    {
+      "name": "generate-command-current",
+      "rule": "Uses 'npx drizzle-kit generate' (not the old 'generate:sqlite' or 'generate:pg' dialect-suffixed syntax)",
+      "relevant_when": "Agent writes migration generation commands"
+    },
+    {
+      "name": "migrate-command-current",
+      "rule": "Uses 'npx drizzle-kit migrate' to apply migrations (not 'push' for production, not old dialect-suffixed syntax)",
+      "relevant_when": "Agent writes migration application commands"
+    },
+    {
+      "name": "migrations-committed-to-git",
+      "rule": "Documentation or notes mention that migration files should be committed to version control",
+      "relevant_when": "Agent writes migration guides or setup documentation"
+    },
+    {
+      "name": "schema-passed-to-drizzle",
+      "rule": "When creating the drizzle instance, passes { schema } as the second argument: drizzle(client, { schema }) to enable the query API",
+      "relevant_when": "Agent sets up the Drizzle database connection"
+    },
+    {
+      "name": "sqlite-foreign-keys-pragma",
+      "rule": "For SQLite, enables foreign_keys=ON pragma since SQLite has foreign key enforcement OFF by default",
+      "relevant_when": "Agent sets up a SQLite database connection with Drizzle"
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "instruction": "Build a user profile edit form",
+  "relevant_when": "Agent builds React forms or edit components",
+  "context": "Proactively check that agents apply React best practices when building forms.",
+  "sources": [
+    {
+      "type": "file",
+      "filename": "skills/react-patterns/SKILL.md",
+      "tile": "tessl-labs/react-patterns"
+    }
+  ],
+  "checklist": [
+    {
+      "name": "controlled-inputs",
+      "rule": "All form inputs are controlled components with value bound to state and onChange handlers",
+      "relevant_when": "Agent builds form inputs"
+    },
+    {
+      "name": "prevent-default-on-submit",
+      "rule": "The form submit handler calls e.preventDefault()",
+      "relevant_when": "Agent writes a form submit handler"
+    },
+    {
+      "name": "novalidate-on-form",
+      "rule": "The form element uses noValidate attribute to disable browser-native validation in favor of custom React validation",
+      "relevant_when": "Agent builds a form with validation"
+    },
+    {
+      "name": "client-side-validation",
+      "rule": "Agent implements client-side validation (e.g. required fields, email format) with inline error messages rendered in the component",
+      "relevant_when": "Agent builds a form that collects user data"
+    },
+    {
+      "name": "aria-required-on-inputs",
+      "rule": "Required inputs have aria-required=\"true\"",
+      "relevant_when": "Agent builds required form inputs"
+    },
+    {
+      "name": "aria-invalid-on-inputs",
+      "rule": "Inputs have aria-invalid bound to their error state (true when there is a validation error, false otherwise)",
+      "relevant_when": "Agent builds form inputs with validation"
+    },
+    {
+      "name": "aria-describedby-linking",
+      "rule": "Inputs use aria-describedby to link to their error message element's id",
+      "relevant_when": "Agent builds form inputs with inline error messages"
+    },
+    {
+      "name": "role-alert-on-errors",
+      "rule": "Validation error message elements use role=\"alert\" so screen readers announce them",
+      "relevant_when": "Agent displays validation error messages"
+    },
+    {
+      "name": "labels-with-htmlfor",
+      "rule": "Form inputs have associated <label> elements using htmlFor (not just placeholder text)",
+      "relevant_when": "Agent builds form inputs"
+    },
+    {
+      "name": "loading-state-during-save",
+      "rule": "Agent shows a loading/submitting state while the form is being saved (e.g. disabled button, spinner, or submitting text)",
+      "relevant_when": "Agent builds a form that submits data to an API"
+    },
+    {
+      "name": "typescript-interfaces",
+      "rule": "Props and form data are typed with TypeScript interfaces, not using 'any'",
+      "relevant_when": "Agent writes React form components with TypeScript"
+    }
+  ]
+}

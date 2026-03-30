@@ -1,0 +1,64 @@
+{
+  "instruction": "Write Drizzle queries with proper operator helpers, transactions, upserts, and type-safe patterns",
+  "relevant_when": "Agent writes Drizzle ORM queries, transactions, or data access code",
+  "context": "Use eq(), and(), inArray(), desc(), asc() from 'drizzle-orm' for all conditions and ordering -- never raw SQL strings. Transactions must use the tx parameter for all operations inside db.transaction(), not the outer db. Destructure .returning() as an array. Use onConflictDoUpdate for upserts instead of check-then-insert. Update updatedAt with SQL expressions (sql`datetime('now')`) not JavaScript Date. Use batch .values([]) for multi-row inserts. Use InferSelectModel/InferInsertModel for type extraction.",
+  "sources": [
+    {
+      "type": "file",
+      "filename": "skills/drizzle-best-practices/SKILL.md",
+      "tile": "tessl-labs/drizzle-best-practices@0.2.0"
+    }
+  ],
+  "checklist": [
+    {
+      "name": "operator-helpers-for-conditions",
+      "rule": "WHERE conditions use imported operator helpers from 'drizzle-orm' (eq, and, inArray, gt, lt, isNull, etc.) rather than raw SQL strings",
+      "relevant_when": "Agent writes Drizzle SELECT, UPDATE, or DELETE queries with conditions"
+    },
+    {
+      "name": "desc-asc-for-ordering",
+      "rule": "ORDER BY clauses use desc() or asc() helpers from 'drizzle-orm', not bare column references",
+      "relevant_when": "Agent writes Drizzle queries with ordering"
+    },
+    {
+      "name": "transaction-uses-tx-not-db",
+      "rule": "Inside db.transaction(async (tx) => { ... }), ALL database operations use the tx parameter, not the outer db object",
+      "relevant_when": "Agent writes Drizzle transactions"
+    },
+    {
+      "name": "transaction-for-multi-table-writes",
+      "rule": "Multi-table write operations (insert parent + children) are wrapped in db.transaction()",
+      "relevant_when": "Agent writes code that creates/updates records across multiple related tables"
+    },
+    {
+      "name": "returning-destructured",
+      "rule": "The result of .returning() is destructured as const [row] = await db.insert(...).returning(), not accessed via index",
+      "relevant_when": "Agent uses .returning() after insert or update"
+    },
+    {
+      "name": "updated-at-sql-expression",
+      "rule": "When updating records, updatedAt is set using sql`datetime('now')` (SQLite) or sql`now()` (PostgreSQL), not a JavaScript Date or ISO string",
+      "relevant_when": "Agent writes Drizzle UPDATE queries on tables with updatedAt columns"
+    },
+    {
+      "name": "upsert-with-on-conflict",
+      "rule": "Upserts use .onConflictDoUpdate({ target, set }) for atomic insert-or-update, not a check-then-insert pattern which has race conditions",
+      "relevant_when": "Agent writes code that needs to insert a record or update it if it already exists"
+    },
+    {
+      "name": "batch-insert-with-values-array",
+      "rule": "Multiple rows are inserted in a single db.insert(table).values([...]) call using an array, not individual insert calls in a loop",
+      "relevant_when": "Agent needs to insert multiple records at once"
+    },
+    {
+      "name": "infer-types-from-schema",
+      "rule": "TypeScript types for rows use InferSelectModel<typeof table> and InferInsertModel<typeof table> from 'drizzle-orm', not manually duplicated interfaces",
+      "relevant_when": "Agent defines TypeScript types for Drizzle table rows"
+    },
+    {
+      "name": "money-as-cents-in-queries",
+      "rule": "Money/price values in insert/update data use integer cents, consistent with the schema definition",
+      "relevant_when": "Agent writes queries that create or update monetary values"
+    }
+  ]
+}

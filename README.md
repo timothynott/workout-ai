@@ -28,13 +28,12 @@ npx tessl auth login
 # Optionally configure MCP for your agent (claude-code, cursor, copilot, codex, etc.)
 npx tessl init --agent <your-agent>
 
-# Install skills for the full stack
-npx tessl install github/jeffallan/claude-skills/nextjs-developer
-npx tessl install github/secondsky/claude-skills/workers-frameworks
-npx tessl install github/jezweb/claude-skills/neon-vercel-postgres
-npx tessl install github/mindrally/skills/drizzle-orm
-npx tessl install github/jezweb/claude-skills/ai-sdk-ui
-npx tessl install github/jezweb/claude-skills/tailwind-v4-shadcn
+# Install skills (official sources and Tessl Labs only)
+npx tessl install github:cloudflare/skills --skill cloudflare --yes
+npx tessl install tessl-labs/drizzle-best-practices --yes
+npx tessl install tessl-labs/react-patterns --yes
+npx tessl install github:vercel/ai --skill ai-sdk --yes
+npx tessl install github:shadcn-ui/ui --skill shadcn --yes
 ```
 
 **GitHub Actions:** Add a `TESSL_TOKEN` secret to the repository (obtained via `npx tessl auth token`) and include the following step in CI workflows so agents running in CI have the same skill context:

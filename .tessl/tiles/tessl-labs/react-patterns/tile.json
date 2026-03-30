@@ -1,0 +1,11 @@
+{
+  "name": "tessl-labs/react-patterns",
+  "version": "0.2.0",
+  "summary": "React patterns — always apply error boundaries, loading states, accessible markup, proper hooks, controlled forms, stable keys, and correct memoization",
+  "skills": {
+    "react-patterns": {
+      "path": "skills/react-patterns/SKILL.md"
+    }
+  },
+  "private": false
+}

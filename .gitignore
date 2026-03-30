@@ -37,6 +37,5 @@ next-env.d.ts
 
 # tooling
 .vscode/
-
-# tessl — agent-specific config, generated per developer via `tessl init --agent <your-agent>`
+.claude/
 .mcp.json

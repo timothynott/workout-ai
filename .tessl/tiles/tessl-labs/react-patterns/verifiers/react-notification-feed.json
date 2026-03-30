@@ -1,0 +1,54 @@
+{
+  "instruction": "Build a notification feed that polls for updates",
+  "relevant_when": "Agent builds React components with polling, intervals, or periodic data fetching",
+  "context": "Proactively check that agents handle useEffect cleanup, stale closures, and derived state correctly in polling components.",
+  "sources": [
+    {
+      "type": "file",
+      "filename": "skills/react-patterns/SKILL.md",
+      "tile": "tessl-labs/react-patterns"
+    }
+  ],
+  "checklist": [
+    {
+      "name": "interval-cleanup",
+      "rule": "The useEffect that sets up the polling interval returns a cleanup function that calls clearInterval to stop polling on unmount or dependency change",
+      "relevant_when": "Agent writes useEffect with setInterval for polling"
+    },
+    {
+      "name": "functional-updater-in-interval",
+      "rule": "State updates inside the interval callback use the functional updater form (setState(prev => ...)) rather than referencing state variables directly, to avoid stale closures",
+      "relevant_when": "Agent updates state inside a setInterval callback"
+    },
+    {
+      "name": "no-object-in-useeffect-deps",
+      "rule": "The useEffect dependency array does not contain objects or functions. Uses primitive values or moves object construction inside the effect.",
+      "relevant_when": "Agent writes useEffect with dependencies"
+    },
+    {
+      "name": "derived-stats-not-in-useeffect",
+      "rule": "Computed/derived values (e.g. unread count, filtered notifications) are calculated with useMemo or inline computation during render, NOT via useEffect updating a separate state variable",
+      "relevant_when": "Agent computes derived values from notification data"
+    },
+    {
+      "name": "loading-state-rendered",
+      "rule": "Agent renders a loading state while initial data is being fetched",
+      "relevant_when": "Agent builds a component that fetches data"
+    },
+    {
+      "name": "error-state-with-role-alert",
+      "rule": "Agent renders an error state with role=\"alert\" when polling or initial fetch fails",
+      "relevant_when": "Agent builds a component that fetches data"
+    },
+    {
+      "name": "stable-keys-on-notifications",
+      "rule": "Notification list items use a stable unique identifier as the key prop, not the array index",
+      "relevant_when": "Agent renders a list of notifications with .map()"
+    },
+    {
+      "name": "typescript-interfaces",
+      "rule": "Props and notification data types are defined with TypeScript interfaces, not using 'any'",
+      "relevant_when": "Agent writes React components with TypeScript"
+    }
+  ]
+}

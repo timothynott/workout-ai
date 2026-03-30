@@ -1,0 +1,54 @@
+{
+  "instruction": "Build a dashboard page that fetches and displays data",
+  "relevant_when": "Agent builds React components, pages, or dashboards",
+  "context": "Proactively check that agents apply React best practices when building any React component, even when not explicitly asked.",
+  "sources": [
+    {
+      "type": "file",
+      "filename": "skills/react-patterns/SKILL.md",
+      "tile": "tessl-labs/react-patterns"
+    }
+  ],
+  "checklist": [
+    {
+      "name": "error-boundary-present",
+      "rule": "Agent wraps the dashboard or its route-level parent in an ErrorBoundary class component with getDerivedStateFromError and componentDidCatch",
+      "relevant_when": "Agent builds a React page or dashboard component"
+    },
+    {
+      "name": "error-boundary-fallback-accessible",
+      "rule": "The ErrorBoundary fallback UI uses role=\"alert\" so screen readers announce the failure",
+      "relevant_when": "Agent builds a React page with an error boundary"
+    },
+    {
+      "name": "loading-state-rendered",
+      "rule": "Agent renders a distinct loading UI (spinner, skeleton, or loading text) while data is being fetched",
+      "relevant_when": "Agent builds a React component that fetches data"
+    },
+    {
+      "name": "error-state-with-retry",
+      "rule": "Agent renders an error message with a retry button/action when the fetch fails, and the error container uses role=\"alert\"",
+      "relevant_when": "Agent builds a React component that fetches data"
+    },
+    {
+      "name": "empty-state-handled",
+      "rule": "Agent renders a meaningful empty state message when the fetched data array is empty, rather than rendering nothing",
+      "relevant_when": "Agent builds a React component that fetches and displays a list of items"
+    },
+    {
+      "name": "useeffect-cleanup",
+      "rule": "The data-fetching useEffect returns a cleanup function (cancelled flag or AbortController) to prevent state updates after unmount",
+      "relevant_when": "Agent writes useEffect with async data fetching"
+    },
+    {
+      "name": "stable-list-keys",
+      "rule": "List items use a stable unique identifier (e.g. item.id) as the key prop, not the array index",
+      "relevant_when": "Agent renders a list of items with .map()"
+    },
+    {
+      "name": "typescript-interfaces",
+      "rule": "Props are typed with TypeScript interfaces, not using 'any'",
+      "relevant_when": "Agent writes React components with TypeScript"
+    }
+  ]
+}
