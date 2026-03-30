@@ -1,5 +1,12 @@
 # Architecture Decision Records
 
+## ADR-011: ORM — Drizzle over Prisma
+**Status:** Accepted
+
+Drizzle is a pure TypeScript library with no binary dependencies, making it edge-native and compatible with the Cloudflare Workers runtime out of the box. Prisma requires a query engine binary that cannot run in Cloudflare Workers; while Prisma now offers an edge-compatible driver (`@prisma/adapter-neon`), it is a more complex setup. Drizzle also has a smaller bundle size, requires no code generation step, and works cleanly with Neon's serverless HTTP driver.
+
+---
+
 ## ADR-001: Hosting — Cloudflare Pages via OpenNext
 **Status:** Accepted
 
