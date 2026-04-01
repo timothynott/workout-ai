@@ -7,10 +7,16 @@ Drizzle is a pure TypeScript library with no binary dependencies, making it edge
 
 ---
 
-## ADR-001: Hosting — Cloudflare Pages via OpenNext
+## ADR-001: Hosting — Cloudflare Workers via OpenNext
 **Status:** Accepted
 
-Next.js deployed to Cloudflare Pages using [OpenNext](https://opennext.js.org/cloudflare) (broader Next.js feature support vs `@cloudflare/next-on-pages`).
+Next.js deployed to **Cloudflare Workers** using [`@opennextjs/cloudflare`](https://opennext.js.org/cloudflare).
+
+**Why Workers over Pages:** Cloudflare now recommends Workers (not Pages) as the deployment target for Next.js. Workers provide the Node.js compatibility layer required for full App Router support (Server Actions, middleware, ISR, Image Optimization). Cloudflare Pages is no longer the recommended path.
+
+**Why OpenNext over `@cloudflare/next-on-pages`:** `@cloudflare/next-on-pages` is deprecated — it only supported the Edge runtime which lacks full Next.js feature support. `@opennextjs/cloudflare` is the current official recommendation.
+
+**Future:** Next.js 16.2 (March 2026) introduced a stable native `adapterPath` Adapter API built in collaboration with the OpenNext maintainers. A first-party Cloudflare adapter built on this API is in development but not yet released. When it ships, migration should be straightforward — OpenNext is the implementation foundation for that adapter.
 
 ---
 

@@ -5,7 +5,7 @@
 | Layer | Technology |
 |---|---|
 | Framework | Next.js (App Router) |
-| Deployment | Cloudflare Pages via OpenNext |
+| Deployment | Cloudflare Workers via `@opennextjs/cloudflare` |
 | Auth | Neon Auth (Stack Auth) |
 | Database | Neon Postgres |
 | AI | Vercel AI SDK (model-agnostic) |
@@ -21,7 +21,7 @@
 Browser (PWA)
     │
     ▼
-Next.js App (Cloudflare Pages / OpenNext)
+Next.js App (Cloudflare Workers / OpenNext)
     ├── /app                  Next.js App Router pages & layouts
     │   └── /api              Route handlers (AI calls, workout ops)
     │        │
