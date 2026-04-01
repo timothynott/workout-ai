@@ -75,7 +75,7 @@ Add the following GitHub Actions step to your preview deployment workflow to inj
 
 1. In the Neon console, enable **Auth** for your project.
 2. Note the Auth URL and API keys.
-3. Add the following to your Cloudflare Pages environment variables (production and preview):
+3. Add the following as Wrangler secrets (see step 4):
    - `NEON_AUTH_URL`
    - `NEON_AUTH_SECRET`
 
@@ -109,7 +109,28 @@ This app deploys to **Cloudflare Workers** (not Pages) using `@opennextjs/cloudf
    npm run cf:preview
    ```
 
-### 5. Local Development
+### 5. GitHub Actions CI/CD
+
+The deploy workflow at [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) automatically builds and deploys to Cloudflare Workers on every push to `main` or `project-scaffold`.
+
+**Required GitHub repository secrets:**
+
+| Secret | How to get it |
+|---|---|
+| `CLOUDFLARE_API_TOKEN` | Cloudflare dashboard → My Profile → API Tokens → Use the **"Edit Cloudflare Workers"** template |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare dashboard URL: `dash.cloudflare.com/<account-id>`, or Workers & Pages sidebar |
+| `TESSL_TOKEN` | `npx tessl auth token` |
+
+Add secrets via the GitHub CLI:
+```bash
+echo "<token>" | gh secret set CLOUDFLARE_API_TOKEN --repo <owner>/<repo>
+echo "<account-id>" | gh secret set CLOUDFLARE_ACCOUNT_ID --repo <owner>/<repo>
+npx tessl auth token | gh secret set TESSL_TOKEN --repo <owner>/<repo>
+```
+
+Or add them manually at: `https://github.com/<owner>/<repo>/settings/secrets/actions`
+
+### 6. Local Development
 
 Copy `.env.example` to `.env.local` and fill in values:
 
