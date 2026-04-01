@@ -111,7 +111,16 @@ This app deploys to **Cloudflare Workers** (not Pages) using `@opennextjs/cloudf
 
 ### 5. GitHub Actions CI/CD
 
-The deploy workflow at [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) automatically builds and deploys to Cloudflare Workers on every push to `main` or `project-scaffold`.
+The deploy workflow at [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) automatically builds and deploys to Cloudflare Workers on every push to any branch.
+
+**Branch deploy behaviour:**
+
+| Branch | Worker name | URL |
+|---|---|---|
+| `main` | `workout-ai` | `workout-ai.<subdomain>.workers.dev` |
+| any other | `workout-ai-<sanitized-branch-name>` | `workout-ai-<branch>.<subdomain>.workers.dev` |
+
+Branch names are lowercased and non-alphanumeric characters replaced with `-`. Worker names are capped at 63 characters. Find the deployed URL for any worker in the [Cloudflare Workers dashboard](https://dash.cloudflare.com).
 
 **Required GitHub repository secrets:**
 

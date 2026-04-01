@@ -7,7 +7,7 @@
 - [x] Add `TESSL_TOKEN` secret to GitHub repository for CI
 - [x] Initialize Next.js app (`create-next-app`, App Router, TypeScript)
 - [x] Configure `@opennextjs/cloudflare` for Cloudflare Workers deployment
-- [x] Add GitHub Actions deploy workflow (`CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` secrets set)
+- [x] Add GitHub Actions deploy workflow with dynamic per-branch worker names (`CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` secrets set)
 - [ ] Set up Neon Postgres project and `main` branch (production)
 - [ ] Create local dev Neon branch (`neon branch create --name dev/yourname`)
 - [ ] Configure Neon GitHub integration for automatic preview branch creation
