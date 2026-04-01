@@ -23,7 +23,7 @@ Next.js deployed to **Cloudflare Workers** using [`@opennextjs/cloudflare`](http
 ## ADR-002: Authentication — Neon Auth
 **Status:** Accepted
 
-[Neon Auth](https://neon.com/docs/auth/overview) (built on Stack Auth) for authentication. Signups are restricted to a configurable allowlist of email addresses stored as a Cloudflare secret.
+[Neon Auth](https://neon.com/docs/auth/overview) (a managed auth service, now built on BetterAuth) for authentication. Signups are restricted to a configurable allowlist of email addresses stored as a Cloudflare secret.
 
 ---
 

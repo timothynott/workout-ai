@@ -6,7 +6,7 @@
 |---|---|
 | Framework | Next.js (App Router) |
 | Deployment | Cloudflare Workers via `@opennextjs/cloudflare` |
-| Auth | Neon Auth (Stack Auth) |
+| Auth | Neon Auth (BetterAuth) |
 | Database | Neon Postgres |
 | AI | Vercel AI SDK (model-agnostic) |
 | Exercise videos | YouTube iframe embeds |
