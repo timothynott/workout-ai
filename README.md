@@ -122,6 +122,10 @@ The deploy workflow at [`.github/workflows/deploy.yml`](.github/workflows/deploy
 
 Branch names are lowercased and non-alphanumeric characters replaced with `-`. Worker names are capped at 63 characters. Find the deployed URL for any worker in the [Cloudflare Workers dashboard](https://dash.cloudflare.com).
 
+**Preview worker cleanup:**
+
+The cleanup workflow at [`.github/workflows/cleanup.yml`](.github/workflows/cleanup.yml) automatically deletes the preview worker when a branch is deleted. To have branches deleted automatically after merge, enable **"Automatically delete head branches"** in your GitHub repository settings (`Settings → General → Pull Requests`).
+
 **Required GitHub repository secrets:**
 
 | Secret | How to get it |
