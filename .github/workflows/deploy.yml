@@ -53,4 +53,4 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Print worker name
-        run: echo "Deployed worker name: ${{ steps.worker.outputs.name }} — find the URL in your Cloudflare Workers dashboard"
+        run: echo "Deployed worker name: ${{ steps.worker.outputs.name }} - find the URL in your Cloudflare Workers dashboard"
