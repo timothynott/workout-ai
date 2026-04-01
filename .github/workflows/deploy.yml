@@ -2,9 +2,6 @@ name: Deploy
 
 on:
   push:
-    branches:
-      - main
-      - project-scaffold
 
 jobs:
   deploy:
@@ -28,8 +25,32 @@ jobs:
         env:
           TESSL_TOKEN: ${{ secrets.TESSL_TOKEN }}
 
-      - name: Build and deploy
-        run: npm run cf:deploy
+      - name: Derive worker name
+        id: worker
+        run: |
+          if [ "$GITHUB_REF_NAME" = "main" ]; then
+            NAME="workout-ai"
+          else
+            SANITIZED=$(echo "$GITHUB_REF_NAME" \
+              | tr '[:upper:]' '[:lower:]' \
+              | sed 's/[^a-z0-9]/-/g' \
+              | sed 's/-\+/-/g' \
+              | sed 's/^-//;s/-$//')
+            NAME="workout-ai-${SANITIZED}"
+            # Cloudflare worker names are max 63 chars
+            NAME="${NAME:0:63}"
+          fi
+          echo "name=$NAME" >> $GITHUB_OUTPUT
+          echo "Deploying as worker: $NAME"
+
+      - name: Build
+        run: npm run cf:build
+
+      - name: Deploy
+        run: npx wrangler deploy --name ${{ steps.worker.outputs.name }}
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Print worker name
+        run: echo "Deployed worker name: ${{ steps.worker.outputs.name }} — find the URL in your Cloudflare Workers dashboard"
