@@ -5,7 +5,7 @@
 - [x] Init Tessl in project (`npx tessl init --agent <your-agent>`)
 - [x] Install Tessl skills for the full stack (Next.js, Cloudflare Workers, Neon, Drizzle, Vercel AI SDK, Tailwind+shadcn)
 - [x] Add `TESSL_TOKEN` secret to GitHub repository for CI
-- [ ] Initialize Next.js app (`create-next-app`, App Router, TypeScript)
+- [x] Initialize Next.js app (`create-next-app`, App Router, TypeScript)
 - [ ] Configure `@opennextjs/cloudflare` for Cloudflare Workers deployment
 - [ ] Set up Neon Postgres project and `main` branch (production)
 - [ ] Create local dev Neon branch (`neon branch create --name dev/yourname`)
