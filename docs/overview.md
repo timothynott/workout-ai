@@ -7,6 +7,7 @@
 | Framework | Next.js (App Router) |
 | Deployment | Cloudflare Workers via `@opennextjs/cloudflare` |
 | Auth | Neon Auth (BetterAuth) |
+| Email | Resend (transactional — OTP, password reset) |
 | Database | Neon Postgres |
 | AI | Vercel AI SDK (model-agnostic) |
 | Exercise videos | YouTube iframe embeds |

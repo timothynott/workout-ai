@@ -15,6 +15,9 @@
 - [x] Configure Neon GitHub integration for automatic preview branch creation
 - [x] Add GitHub Actions workflow to set `DATABASE_URL` on Cloudflare Workers preview deployments
 - [x] Install and configure Neon Auth (BetterAuth)
+- [ ] Add Google as an identity provider (OAuth via Neon Auth)
+- [ ] Enable email OTP plugin (signup verification, passwordless sign-in, password reset)
+- [ ] Create Resend account, configure domain, and add SMTP credentials as Cloudflare secrets
 - [x] Set up Drizzle ORM + schema migrations
 - [ ] Configure Vercel AI SDK + provider abstraction
 - [ ] Install and configure Tailwind CSS
@@ -22,7 +25,14 @@
 - [ ] Configure PWA manifest and service worker (next-pwa or similar)
 - [ ] Set up Cloudflare secrets (`ALLOWED_EMAILS`, `ENCRYPTION_KEY`)
 
-## Phase 2 — Onboarding
+## Phase 2 — Signup Quota Gating
+- [ ] Create `lib/quota.ts` with `QUOTA` constants: `daily` (100) and `monthly` (3000) — update here when upgrading Resend plan
+- [ ] Create `lib/quota-check.ts` with `checkSignupQuota`: queries `neon_auth.users` for counts since `CURRENT_DATE` (daily) and `NOW() - INTERVAL '31 days'` (monthly), returns `{ allowed, reason }`
+- [ ] Create `user.before_create` webhook handler at `app/webhooks/neon-auth/route.ts`: verify Neon Auth webhook signature, call `checkSignupQuota`, return `{ allowed: true/false }` with `error_code` and `error_message`
+- [ ] Register webhook with Neon Auth API, subscribing to `user.before_create` pointing at deployed webhook URL
+- [ ] Update signup UI to surface quota error codes (`daily_limit`, `monthly_limit`) with user-friendly messaging
+
+## Phase 3 — Onboarding
 - [ ] Add encryption/decryption utility for sensitive fields (`/lib/crypto.ts`, AES-256-GCM, key from `ENCRYPTION_KEY` secret)
 - [ ] Schema: add `user_profile` table (equipment, frequency, preferences, goals, optional goal weight, encrypted AI provider credentials) + migrate
 - [ ] Schema: add `exercises` table (AI-generated library) + migrate
@@ -35,13 +45,13 @@
 - [ ] Save profile to DB
 - [ ] Trigger initial AI plan generation on completion
 
-## Phase 3 — Workout Plan & Session Views
+## Phase 4 — Workout Plan & Session Views
 - [ ] Dashboard: upcoming sessions calendar/list view
 - [ ] Session detail: warm-up / exercises / cool-down summary
 - [ ] Start / Postpone CTA
 - [ ] Postpone flow: pick delay → update scheduled date
 
-## Phase 4 — Active Session (Workout Player)
+## Phase 5 — Active Session (Workout Player)
 - [ ] Schema: add `session_feedback` table (post-session ratings and completion data) + migrate
 - [ ] Schema: add `exercise_feedback` table (per-exercise completion within a session) + migrate
 - [ ] Exercise stepper (one exercise at a time)
@@ -51,12 +61,12 @@
 - [ ] Post-exercise micro-feedback (completed? how much?)
 - [ ] Post-session rating (too easy / just right / too hard)
 
-## Phase 5 — AI Feedback Loop
+## Phase 6 — AI Feedback Loop
 - [ ] Store all session + exercise feedback
 - [ ] Feed feedback history into AI when generating next session
 - [ ] AI adjusts sets / reps / duration / exercise selection accordingly
 
-## Phase 6 — Progress Charts
+## Phase 7 — Progress Charts
 - [ ] Schema: add `weigh_ins` table (user, date, weight — weight-loss goal users only) + migrate
 - [ ] Session completion rate over time
 - [ ] Per-exercise completion trend
@@ -65,7 +75,7 @@
 - [ ] Weekly weigh-in prompt (weight-loss goal users only)
 - [ ] Weight over time chart (weight-loss goal users only)
 
-## Phase 7 — Polish & Deploy
+## Phase 8 — Polish & Deploy
 - [ ] Mobile-first responsive UI pass
 - [ ] PWA install prompt
 - [ ] Deploy to Cloudflare Workers (production)

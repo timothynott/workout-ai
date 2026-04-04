@@ -1,5 +1,21 @@
 # Architecture Decision Records
 
+## ADR-014: Signup Quota Gating — `user.before_create` Webhook
+**Status:** Accepted
+
+Signups are rate-limited to protect Resend's free-tier email quota. A `user.before_create` webhook from Neon Auth calls a server-side handler that queries `neon_auth.users` for daily and monthly signup counts and rejects the request if either limit is exceeded.
+
+Quota constants live in `lib/quota.ts` (`daily: 100`, `monthly: 3000`) so limits can be updated in one place when the Resend plan changes. Error codes (`daily_limit`, `monthly_limit`) are surfaced to the user in the signup UI.
+
+---
+
+## ADR-013: Transactional Email — Resend
+**Status:** Accepted
+
+[Resend](https://resend.com) is the transactional email provider for all auth-related emails (signup verification OTP, passwordless sign-in, password reset). SMTP credentials are stored as Cloudflare secrets.
+
+---
+
 ## ADR-011: ORM — Drizzle over Prisma
 **Status:** Accepted
 
