@@ -1,18 +1,41 @@
 'use client';
 
-import { useActionState, useState } from 'react';
-import { signIn, signUp } from './actions';
-
-const initialState = { error: undefined as string | undefined };
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function SignInPage() {
+  const router = useRouter();
   const [mode, setMode] = useState<'sign-in' | 'sign-up'>('sign-in');
-  const [signInState, signInAction, signInPending] = useActionState(signIn, initialState);
-  const [signUpState, signUpAction, signUpPending] = useActionState(signUp, initialState);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
 
   const isSignIn = mode === 'sign-in';
-  const error = isSignIn ? signInState?.error : signUpState?.error;
-  const pending = isSignIn ? signInPending : signUpPending;
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError(null);
+    setPending(true);
+
+    const form = new FormData(e.currentTarget);
+    const body = isSignIn
+      ? { email: form.get('email'), password: form.get('password') }
+      : { email: form.get('email'), password: form.get('password'), name: form.get('name') };
+
+    const res = await fetch(isSignIn ? '/api/sign-in' : '/api/sign-up', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      setError(data.error ?? 'Something went wrong.');
+      setPending(false);
+      return;
+    }
+
+    router.push('/');
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center">
@@ -21,7 +44,7 @@ export default function SignInPage() {
           {isSignIn ? 'Sign in' : 'Create account'}
         </h1>
 
-        <form action={isSignIn ? signInAction : signUpAction} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {!isSignIn && (
             <div>
               <label htmlFor="name" className="block text-sm font-medium mb-1">
@@ -66,9 +89,7 @@ export default function SignInPage() {
             />
           </div>
 
-          {error && (
-            <p className="text-sm text-red-600">{error}</p>
-          )}
+          {error && <p className="text-sm text-red-600">{error}</p>}
 
           <button
             type="submit"
@@ -83,7 +104,7 @@ export default function SignInPage() {
           {isSignIn ? "Don't have an account?" : 'Already have an account?'}{' '}
           <button
             type="button"
-            onClick={() => setMode(isSignIn ? 'sign-up' : 'sign-in')}
+            onClick={() => { setMode(isSignIn ? 'sign-up' : 'sign-in'); setError(null); }}
             className="underline"
           >
             {isSignIn ? 'Sign up' : 'Sign in'}
