@@ -11,7 +11,7 @@
 - [x] Add GitHub Actions cleanup workflow to delete preview workers on branch delete
 - [x] Enable "Automatically delete head branches" in GitHub repo settings (`Settings → General → Pull Requests`)
 - [x] Set up Neon Postgres project and `main` branch (production)
-- [x] Create local dev Neon branch (`neon branch create --name dev/yourname`)
+- [ ] Create local dev Neon branch (`neon branch create --name dev/yourname`)
 - [ ] Configure Neon GitHub integration for automatic preview branch creation
 - [ ] Add GitHub Actions workflow to set `DATABASE_URL` on Cloudflare Workers preview deployments
 - [ ] Install and configure Neon Auth (BetterAuth)
