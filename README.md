@@ -94,8 +94,8 @@ Once installed, Neon will create a `preview/<branch-name>` database branch every
 
 ### 3. Neon Auth Setup
 
-1. In the Neon console, go to your project → **Auth** tab → click **Enable Auth**.
-2. Once enabled, go to **Auth → Configuration** and copy the **Auth URL** — this is `NEON_AUTH_BASE_URL`.
+1. In the Neon console, go to your project → **Auth** tab.
+2. Under **Project Info**, copy the **Auth URL** — this is `NEON_AUTH_BASE_URL`.
 3. Generate a cookie secret:
    ```bash
    openssl rand -base64 32
