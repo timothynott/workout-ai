@@ -63,6 +63,24 @@ jobs:
         env:
           DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url_with_pooler }}
 
+      - name: Derive preview Worker name
+        id: worker
+        run: |
+          SANITIZED=$(echo "${{ needs.setup.outputs.branch }}" \
+            | tr '[:upper:]' '[:lower:]' \
+            | sed 's/[^a-z0-9]/-/g' \
+            | sed 's/-\+/-/g' \
+            | sed 's/^-//;s/-$//')
+          NAME="workout-ai-${SANITIZED}"
+          echo "name=${NAME:0:63}" >> $GITHUB_OUTPUT
+
+      - name: Set DATABASE_URL on preview Worker
+        run: echo "$DB_URL" | npx wrangler secret put DATABASE_URL --name ${{ steps.worker.outputs.name }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          DB_URL: ${{ steps.create_neon_branch.outputs.db_url_with_pooler }}
+
   delete_neon_branch:
     name: Delete Neon Branch
     needs: setup
