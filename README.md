@@ -94,11 +94,15 @@ Once installed, Neon will create a `preview/<branch-name>` database branch every
 
 ### 3. Neon Auth Setup
 
-1. In the Neon console, enable **Auth** for your project.
-2. Note the Auth URL and API keys.
-3. Add the following as Wrangler secrets (see step 4):
-   - `NEON_AUTH_URL`
-   - `NEON_AUTH_SECRET`
+1. In the Neon console, go to your project → **Auth** tab → click **Enable Auth**.
+2. Once enabled, go to **Auth → Configuration** and copy the **Auth URL** — this is `NEON_AUTH_BASE_URL`.
+3. Generate a cookie secret:
+   ```bash
+   openssl rand -base64 32
+   ```
+4. Add both as Wrangler secrets (see step 4):
+   - `NEON_AUTH_BASE_URL` — the Auth URL from the console
+   - `NEON_AUTH_COOKIE_SECRET` — the generated secret
 
 ### 4. Cloudflare Workers Setup
 
@@ -115,8 +119,8 @@ This app deploys to **Cloudflare Workers** (not Pages) using `@opennextjs/cloudf
 3. Set production secrets via the Cloudflare dashboard or Wrangler:
    ```bash
    wrangler secret put DATABASE_URL
-   wrangler secret put NEON_AUTH_URL
-   wrangler secret put NEON_AUTH_SECRET
+   wrangler secret put NEON_AUTH_BASE_URL
+   wrangler secret put NEON_AUTH_COOKIE_SECRET
    wrangler secret put AI_API_KEY
    wrangler secret put ALLOWED_EMAILS
    ```
@@ -173,8 +177,8 @@ cp .env.example .env.local
 
 ```env
 DATABASE_URL=           # your dev/yourname Neon branch connection string
-NEON_AUTH_URL=
-NEON_AUTH_SECRET=
+NEON_AUTH_BASE_URL=    # Auth URL from Neon console → Auth tab → Configuration
+NEON_AUTH_COOKIE_SECRET= # openssl rand -base64 32
 AI_PROVIDER=anthropic
 AI_MODEL=claude-sonnet-4-6
 AI_API_KEY=

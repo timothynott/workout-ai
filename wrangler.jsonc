@@ -11,5 +11,11 @@
   "vars": {
     "AI_PROVIDER": "anthropic",
     "AI_MODEL": "claude-sonnet-4-6"
-  }
+  },
+  // Secrets (set via `wrangler secret put` or Cloudflare dashboard):
+  //   DATABASE_URL          — Neon Postgres production connection string
+  //   NEON_AUTH_BASE_URL    — Neon Auth API URL (from Neon console → Auth tab)
+  //   NEON_AUTH_COOKIE_SECRET — Random 32+ char secret (openssl rand -base64 32)
+  //   AI_API_KEY            — API key for the chosen AI provider
+  //   ALLOWED_EMAILS        — Comma-separated list of authorised email addresses
 }
