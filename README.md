@@ -121,11 +121,11 @@ This app deploys to **Cloudflare Workers** (not Pages) using `@opennextjs/cloudf
    wrangler secret put DATABASE_URL
    wrangler secret put NEON_AUTH_BASE_URL
    wrangler secret put NEON_AUTH_COOKIE_SECRET
-   wrangler secret put AI_API_KEY
    wrangler secret put ALLOWED_EMAILS
+   wrangler secret put ENCRYPTION_KEY   # openssl rand -base64 32
    ```
-4. `AI_PROVIDER` and `AI_MODEL` are already set in `wrangler.jsonc` under `vars` — update values there if needed.
-5. Deploy:
+   > AI provider credentials (API key, provider, model) are supplied by the user during onboarding and stored encrypted in the database — no server-side AI secrets needed.
+4. Deploy:
    ```bash
    npm run cf:deploy
    ```
@@ -176,18 +176,19 @@ cp .env.example .env.local
 ```
 
 ```env
-DATABASE_URL=           # your dev/yourname Neon branch connection string
-NEON_AUTH_BASE_URL=    # Auth URL from Neon console → Auth tab → Configuration
-NEON_AUTH_COOKIE_SECRET= # openssl rand -base64 32
-AI_PROVIDER=anthropic
-AI_MODEL=claude-sonnet-4-6
-AI_API_KEY=
+DATABASE_URL=              # your dev/yourname Neon branch connection string
+NEON_AUTH_BASE_URL=        # Auth URL from Neon console → Auth tab → Configuration
+NEON_AUTH_COOKIE_SECRET=   # openssl rand -base64 32
 ALLOWED_EMAILS=you@example.com
+ENCRYPTION_KEY=            # openssl rand -base64 32
 ```
+
+> AI provider credentials are entered by the user in the onboarding UI and stored encrypted in the database using `ENCRYPTION_KEY`.
 
 Then:
 ```bash
 npm install
+git config core.hooksPath .githooks   # one-time: enable commit message linting
 npm run dev
 ```
 
