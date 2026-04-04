@@ -163,11 +163,14 @@ The cleanup workflow at [`.github/workflows/cleanup.yml`](.github/workflows/clea
 |---|---|
 | `NEON_PROJECT_ID` | Neon console → project settings, or visible in the console URL |
 
-Add secrets via the GitHub CLI:
+Add secrets and variables via the GitHub CLI:
 ```bash
 echo "<token>" | gh secret set CLOUDFLARE_API_TOKEN --repo <owner>/<repo>
 echo "<account-id>" | gh secret set CLOUDFLARE_ACCOUNT_ID --repo <owner>/<repo>
 npx tessl auth token | gh secret set TESSL_TOKEN --repo <owner>/<repo>
+echo "<neon-api-key>" | gh secret set NEON_API_KEY --repo <owner>/<repo>
+echo "<production-connection-string>" | gh secret set DATABASE_URL --repo <owner>/<repo>
+gh variable set NEON_PROJECT_ID --body "<neon-project-id>" --repo <owner>/<repo>
 ```
 
 Or add them manually at: `https://github.com/<owner>/<repo>/settings/secrets/actions`
