@@ -13,7 +13,7 @@
 - [x] Set up Neon Postgres project and `main` branch (production)
 - [x] Create local dev Neon branch (`neon branch create --name dev/yourname`)
 - [x] Configure Neon GitHub integration for automatic preview branch creation
-- [ ] Add GitHub Actions workflow to set `DATABASE_URL` on Cloudflare Workers preview deployments
+- [x] Add GitHub Actions workflow to set `DATABASE_URL` on Cloudflare Workers preview deployments
 - [ ] Install and configure Neon Auth (BetterAuth)
 - [ ] Set up Drizzle ORM + schema migrations
 - [ ] Configure Vercel AI SDK + provider abstraction
