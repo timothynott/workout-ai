@@ -15,37 +15,33 @@
 - [x] Configure Neon GitHub integration for automatic preview branch creation
 - [x] Add GitHub Actions workflow to set `DATABASE_URL` on Cloudflare Workers preview deployments
 - [x] Install and configure Neon Auth (BetterAuth)
-- [ ] Set up Drizzle ORM + schema migrations
+- [x] Set up Drizzle ORM + schema migrations
 - [ ] Configure Vercel AI SDK + provider abstraction
 - [ ] Install and configure Tailwind CSS
 - [ ] Initialize shadcn/ui (`npx shadcn@latest init`)
 - [ ] Configure PWA manifest and service worker (next-pwa or similar)
 - [ ] Set up Cloudflare secrets (AI keys, allowed emails)
 
-## Phase 2 — Database Schema
-- [ ] `users` (managed by Neon Auth, extended with profile data)
-- [ ] `user_profile` (equipment, frequency, preferences, goals, optional goal weight)
-- [ ] `weigh_ins` (user, date, weight — only for weight-loss goal users)
-- [ ] `exercises` (AI-generated library)
-- [ ] `workout_plans` (AI-generated plans linked to a user)
-- [ ] `sessions` (individual workout days, scheduled date)
-- [ ] `session_exercises` (ordered exercises within a session)
-- [ ] `session_feedback` (post-session ratings and completion data)
-- [ ] `exercise_feedback` (per-exercise completion within a session)
-
-## Phase 3 — Onboarding
+## Phase 2 — Onboarding
+- [ ] Schema: add `user_profile` table (equipment, frequency, preferences, goals, optional goal weight) + migrate
+- [ ] Schema: add `exercises` table (AI-generated library) + migrate
+- [ ] Schema: add `workout_plans` table (AI-generated plans linked to a user) + migrate
+- [ ] Schema: add `sessions` table (individual workout days, scheduled date) + migrate
+- [ ] Schema: add `session_exercises` table (ordered exercises within a session) + migrate
 - [ ] Multi-step onboarding flow (equipment → frequency → types → exclusions → goals)
 - [ ] If weight loss goal selected: prompt for goal weight and current weight
 - [ ] Save profile to DB
 - [ ] Trigger initial AI plan generation on completion
 
-## Phase 4 — Workout Plan & Session Views
+## Phase 3 — Workout Plan & Session Views
 - [ ] Dashboard: upcoming sessions calendar/list view
 - [ ] Session detail: warm-up / exercises / cool-down summary
 - [ ] Start / Postpone CTA
 - [ ] Postpone flow: pick delay → update scheduled date
 
-## Phase 5 — Active Session (Workout Player)
+## Phase 4 — Active Session (Workout Player)
+- [ ] Schema: add `session_feedback` table (post-session ratings and completion data) + migrate
+- [ ] Schema: add `exercise_feedback` table (per-exercise completion within a session) + migrate
 - [ ] Exercise stepper (one exercise at a time)
 - [ ] Timed exercise: 10-second countdown → run timer → auto-advance
 - [ ] Rep exercise: manual Done button
@@ -53,12 +49,13 @@
 - [ ] Post-exercise micro-feedback (completed? how much?)
 - [ ] Post-session rating (too easy / just right / too hard)
 
-## Phase 6 — AI Feedback Loop
+## Phase 5 — AI Feedback Loop
 - [ ] Store all session + exercise feedback
 - [ ] Feed feedback history into AI when generating next session
 - [ ] AI adjusts sets / reps / duration / exercise selection accordingly
 
-## Phase 7 — Progress Charts
+## Phase 6 — Progress Charts
+- [ ] Schema: add `weigh_ins` table (user, date, weight — weight-loss goal users only) + migrate
 - [ ] Session completion rate over time
 - [ ] Per-exercise completion trend
 - [ ] Session difficulty ratings over time
@@ -66,7 +63,7 @@
 - [ ] Weekly weigh-in prompt (weight-loss goal users only)
 - [ ] Weight over time chart (weight-loss goal users only)
 
-## Phase 8 — Polish & Deploy
+## Phase 7 — Polish & Deploy
 - [ ] Mobile-first responsive UI pass
 - [ ] PWA install prompt
 - [ ] Deploy to Cloudflare Workers (production)
