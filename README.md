@@ -154,6 +154,14 @@ The cleanup workflow at [`.github/workflows/cleanup.yml`](.github/workflows/clea
 | `CLOUDFLARE_API_TOKEN` | Cloudflare dashboard → My Profile → API Tokens → Use the **"Edit Cloudflare Workers"** template |
 | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare dashboard URL: `dash.cloudflare.com/<account-id>`, or Workers & Pages sidebar |
 | `TESSL_TOKEN` | `npx tessl auth token` |
+| `NEON_API_KEY` | Neon console → Account Settings → API Keys → Create new key |
+| `DATABASE_URL` | Production connection string for the Neon `main` branch |
+
+**Required GitHub repository variables** (not secrets — set under Settings → Secrets and variables → Actions → Variables tab):
+
+| Variable | How to get it |
+|---|---|
+| `NEON_PROJECT_ID` | Neon console → project settings, or visible in the console URL |
 
 Add secrets via the GitHub CLI:
 ```bash
