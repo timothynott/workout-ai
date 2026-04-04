@@ -47,9 +47,22 @@ npx tessl install github:shadcn-ui/ui --skill shadcn --yes
 
 ### 2. Neon Setup
 
-1. Create a new Neon project at [console.neon.tech](https://console.neon.tech).
-2. The default branch (`main`) is your production database.
-3. Note the connection string — this becomes `DATABASE_URL` in production.
+#### Create the project
+
+1. Go to [console.neon.tech](https://console.neon.tech) and click **New project**.
+2. Name it (e.g. `workout-ai`). Leave the default Postgres version and region as-is unless you have a preference.
+3. The project is created with a default branch named `main` — this is your **production database**. Do not rename it.
+4. Once created, open the project and go to **Dashboard → Connection string**. Copy the pooled connection string (it looks like `postgresql://user:pass@ep-xxx.region.aws.neon.tech/neondb?sslmode=require`). This is your production `DATABASE_URL`.
+
+#### Store the production DATABASE_URL
+
+Add it as a GitHub Actions secret so the CI/CD deploy workflow can set it on the production Worker:
+
+```bash
+echo "<connection-string>" | gh secret set DATABASE_URL --repo <owner>/<repo>
+```
+
+Also note the **Project ID** (visible in the URL: `console.neon.tech/app/projects/<project-id>` or under project settings) — you'll need it for the GitHub integration in a later step.
 
 **Local development branch:**
 ```bash
