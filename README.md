@@ -89,7 +89,6 @@ The Neon GitHub integration automatically creates a Neon branch for each git bra
 1. Go to your Neon project → **Settings → Integrations → GitHub**.
 2. Click **Install** and authorise Neon to access your GitHub account.
 3. Select the repository (`workout-ai` or whatever you named it) and click **Connect**.
-4. Under **Branch settings**, confirm that the integration is set to create a Neon branch for each git branch.
 
 Once installed, Neon will create a `preview/<branch-name>` database branch every time a new git branch is pushed. The deploy workflow already handles wiring the matching `DATABASE_URL` to the preview Worker via `neondatabase/create-branch-action` — no extra workflow changes needed.
 
