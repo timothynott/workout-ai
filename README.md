@@ -64,12 +64,23 @@ echo "<connection-string>" | gh secret set DATABASE_URL --repo <owner>/<repo>
 
 Also note the **Project ID** (visible in the URL: `console.neon.tech/app/projects/<project-id>` or under project settings) — you'll need it for the GitHub integration in a later step.
 
-**Local development branch:**
+#### Create a local dev branch
+
+Each developer gets their own Neon branch so local work never touches production data.
+
+Install the Neon CLI if you don't have it:
 ```bash
-neonctl branch create --name dev/yourname
-neonctl connection-string dev/yourname
+npm install -g neonctl
+neonctl auth
 ```
-Add the output as `DATABASE_URL` in `.env.local`.
+
+Create your branch (replace `yourname`):
+```bash
+neonctl branch create --name dev/yourname --project-id <project-id>
+neonctl connection-string dev/yourname --project-id <project-id> --pooled
+```
+
+Copy the output connection string into `.env.local` as `DATABASE_URL` (see [Local Development](#6-local-development) below).
 
 **Preview branch automation:**
 
