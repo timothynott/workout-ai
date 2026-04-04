@@ -44,6 +44,9 @@ Captured during onboarding; drives all AI plan generation.
 - Excluded exercises (injury, preference)
 - Goals (weight loss, muscle gain, endurance, etc.)
 - **If weight loss is a goal:** goal weight (lbs/kg)
+- AI provider (anthropic, openai, google, etc.)
+- AI model ID
+- AI API key (encrypted at rest)
 
 ### Exercise
 AI-generated and persisted. Fields:
@@ -117,12 +120,7 @@ Neon: dev/[your-name]      ← manually created for local development
 
 ## AI Provider Abstraction
 
-All AI calls go through `/lib/ai/provider.ts`. The active provider and model are configured via environment variables:
-
-```
-AI_PROVIDER=anthropic          # anthropic | openai | google | ...
-AI_MODEL=claude-sonnet-4-6     # model ID for the chosen provider
-```
+All AI calls go through `/lib/ai/provider.ts`. The user's provider, model ID, and API key are stored in their `user_profile` (API key encrypted at rest using AES-256-GCM — see ADR-012). At request time, the server decrypts the key and instantiates the correct Vercel AI SDK provider.
 
 The abstraction exposes two main operations:
 - `generateWorkoutPlan(profile, history)` → structured workout plan

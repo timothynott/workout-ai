@@ -20,15 +20,17 @@
 - [ ] Install and configure Tailwind CSS
 - [ ] Initialize shadcn/ui (`npx shadcn@latest init`)
 - [ ] Configure PWA manifest and service worker (next-pwa or similar)
-- [ ] Set up Cloudflare secrets (AI keys, allowed emails)
+- [ ] Set up Cloudflare secrets (`ALLOWED_EMAILS`, `ENCRYPTION_KEY`)
 
 ## Phase 2 — Onboarding
-- [ ] Schema: add `user_profile` table (equipment, frequency, preferences, goals, optional goal weight) + migrate
+- [ ] Add encryption/decryption utility for sensitive fields (`/lib/crypto.ts`, AES-256-GCM, key from `ENCRYPTION_KEY` secret)
+- [ ] Schema: add `user_profile` table (equipment, frequency, preferences, goals, optional goal weight, encrypted AI provider credentials) + migrate
 - [ ] Schema: add `exercises` table (AI-generated library) + migrate
 - [ ] Schema: add `workout_plans` table (AI-generated plans linked to a user) + migrate
 - [ ] Schema: add `sessions` table (individual workout days, scheduled date) + migrate
 - [ ] Schema: add `session_exercises` table (ordered exercises within a session) + migrate
-- [ ] Multi-step onboarding flow (equipment → frequency → types → exclusions → goals)
+- [ ] Multi-step onboarding flow (equipment → frequency → types → exclusions → goals → AI provider)
+- [ ] Onboarding step: AI provider selection (provider, model ID, API key — key encrypted before save)
 - [ ] If weight loss goal selected: prompt for goal weight and current weight
 - [ ] Save profile to DB
 - [ ] Trigger initial AI plan generation on completion

@@ -34,10 +34,23 @@ Neon Postgres for all persistent storage. Chosen because Neon Auth already requi
 
 ---
 
-## ADR-004: AI Abstraction — Vercel AI SDK
+## ADR-004: AI Abstraction — Vercel AI SDK with User-Supplied Credentials
 **Status:** Accepted
 
-The [Vercel AI SDK](https://sdk.vercel.ai) provides a model-agnostic interface over Claude, OpenAI, Google, and others. All AI interactions go through a thin provider abstraction so the underlying model can be swapped or A/B tested without changing application logic.
+The [Vercel AI SDK](https://sdk.vercel.ai) provides a model-agnostic interface over Claude, OpenAI, Google, and others. All AI interactions go through a thin provider abstraction in `/lib/ai/provider.ts`.
+
+Rather than storing AI credentials as server-side environment variables, each user supplies their own provider, model ID, and API key during onboarding. These are stored in the `user_profile` table (API key encrypted at rest — see ADR-012). At request time, the server decrypts the user's key and instantiates the correct Vercel AI SDK provider.
+
+This keeps AI costs attributed to the user's own account and avoids any shared server-side API key.
+
+---
+
+## ADR-012: Encryption at Rest for Sensitive User Data
+**Status:** Accepted
+
+Sensitive fields in the database (currently: AI API keys in `user_profile`) are encrypted at rest using AES-256-GCM before being written to Neon. A single app-level encryption key is stored as a Cloudflare secret (`ENCRYPTION_KEY`) and never touches the database.
+
+Encryption and decryption are handled by a thin utility at `/lib/crypto.ts`. All writes to encrypted fields go through this utility — raw plaintext values are never persisted.
 
 ---
 
