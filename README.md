@@ -188,6 +188,14 @@ ALLOWED_EMAILS=you@example.com
 Then:
 ```bash
 npm install
-npm run db:migrate
 npm run dev
 ```
+
+**Drizzle commands** (used as tables are added in Phase 2+):
+
+| Command | What it does |
+|---|---|
+| `npm run db:generate` | Generate SQL migration files from schema changes |
+| `npm run db:migrate` | Apply pending migrations to the database |
+| `npm run db:push` | Prototype mode: push schema directly (no migration files) |
+| `npm run db:studio` | Open Drizzle Studio GUI |
