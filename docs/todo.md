@@ -15,7 +15,11 @@
 - [x] Configure Neon GitHub integration for automatic preview branch creation
 - [x] Add GitHub Actions workflow to set `DATABASE_URL` on Cloudflare Workers preview deployments
 - [x] Install and configure Neon Auth (BetterAuth)
-- [ ] Add Google as an identity provider (OAuth via Neon Auth)
+- [x] Add Google as an identity provider (OAuth via Neon Auth)
+  - [x] Add `authClient.signIn.social` + Google button to sign-in page
+  - [x] Register app in Google Cloud Console, create OAuth 2.0 Client ID, add redirect URI (`/api/auth/callback/google`)
+  - [x] Publish app in Google Cloud Console OAuth consent screen (moves out of testing mode)
+  - [x] Paste Client ID + Secret into Neon Auth dashboard → OAuth Providers
 - [ ] Enable email OTP plugin (signup verification, passwordless sign-in, password reset)
 - [ ] Create Resend account, configure domain, and add SMTP credentials as Cloudflare secrets
 - [x] Set up Drizzle ORM + schema migrations
@@ -80,3 +84,13 @@
 - [ ] PWA install prompt
 - [ ] Deploy to Cloudflare Workers (production)
 - [ ] Smoke test on real phone
+
+## Phase 9 — Google OAuth Verification & Branding
+- [ ] Decide on a final app name
+- [ ] Design and add app logo
+- [ ] Build a public homepage (can be a simple landing page on the production domain)
+- [ ] Write and publish a Privacy Policy page
+- [ ] Write and publish a Terms of Service page
+- [ ] Update Google Cloud Console OAuth consent screen with final name, logo, homepage, privacy policy, and ToS URLs
+- [ ] Submit app for Google OAuth verification
+- [ ] Mark consent screen verification sub-task complete in Phase 1 once approved

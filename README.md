@@ -104,6 +104,19 @@ Once installed, Neon will create a `preview/<branch-name>` database branch every
    - `NEON_AUTH_BASE_URL` — the Auth URL from the console
    - `NEON_AUTH_COOKIE_SECRET` — the generated secret
 
+#### Google OAuth
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/) → **APIs & Services → Credentials**.
+2. Create an **OAuth 2.0 Client ID** (Web application).
+3. Add the authorised redirect URI:
+   ```
+   https://<your-worker-domain>/api/auth/callback/google
+   ```
+4. Copy the **Client ID** and **Client Secret**.
+5. In the Neon console → **Auth** tab → **OAuth Providers**, enable Google and paste the credentials.
+
+No code changes or Cloudflare secrets needed — credentials are managed entirely within Neon Auth.
+
 ### 4. Cloudflare Workers Setup
 
 This app deploys to **Cloudflare Workers** (not Pages) using `@opennextjs/cloudflare`.
