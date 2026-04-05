@@ -104,6 +104,12 @@ Once installed, Neon will create a `preview/<branch-name>` database branch every
    - `NEON_AUTH_BASE_URL` — the Auth URL from the console
    - `NEON_AUTH_COOKIE_SECRET` — the generated secret
 
+#### Email Verification
+
+In the Neon console → **Auth** tab → **Configuration**, enable **Email verification**. This requires users to verify their email address on signup. Neon Auth handles sending the verification code automatically.
+
+> **Note:** In development, Neon's shared email server is used. For production, configure Resend as the custom SMTP provider (see [Resend Setup](#resend-setup) below) before going live — the shared server is rate-limited and not suitable for production.
+
 #### Google OAuth
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com/) → **APIs & Services → Credentials**.
@@ -117,7 +123,23 @@ Once installed, Neon will create a `preview/<branch-name>` database branch every
 
 No code changes or Cloudflare secrets needed — credentials are managed entirely within Neon Auth.
 
-### 4. Cloudflare Workers Setup
+### 4. Resend Setup
+
+Resend is used as the production SMTP provider for all auth emails (signup verification, password reset).
+
+1. Create an account at [resend.com](https://resend.com).
+2. Add and verify your sending domain under **Domains**.
+3. Create an API key under **API Keys**.
+4. In the Neon console → **Auth** tab → **Configuration → Email server**, switch from **Shared** to **Custom SMTP** and enter your Resend SMTP credentials:
+   - Host: `smtp.resend.com`
+   - Port: `465`
+   - Username: `resend`
+   - Password: your Resend API key
+   - From address: `noreply@yourdomain.com`
+
+> Resend's free tier supports 3,000 emails/month and 100/day — sufficient for a personal app.
+
+### 5. Cloudflare Workers Setup
 
 This app deploys to **Cloudflare Workers** (not Pages) using `@opennextjs/cloudflare`.
 
@@ -147,7 +169,7 @@ This app deploys to **Cloudflare Workers** (not Pages) using `@opennextjs/cloudf
    npm run cf:preview
    ```
 
-### 5. GitHub Actions CI/CD
+### 6. GitHub Actions CI/CD
 
 The deploy workflow at [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) automatically builds and deploys to Cloudflare Workers on every push to any branch.
 
@@ -180,7 +202,7 @@ npx tessl auth token | gh secret set TESSL_TOKEN --repo <owner>/<repo>
 
 Or add them manually at: `https://github.com/<owner>/<repo>/settings/secrets/actions`
 
-### 6. Local Development
+### 7. Local Development
 
 Copy `.env.example` to `.env.local` and fill in values:
 
