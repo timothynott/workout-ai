@@ -36,14 +36,7 @@ npx tessl install github:vercel/ai --skill ai-sdk --yes
 npx tessl install github:shadcn-ui/ui --skill shadcn --yes
 ```
 
-**GitHub Actions:** Add a `TESSL_TOKEN` secret to the repository (obtained via `npx tessl auth token`) and include the following step in CI workflows so agents running in CI have the same skill context:
-
-```yaml
-- name: Install Tessl skills
-  run: npx tessl install --yes
-  env:
-    TESSL_TOKEN: ${{ secrets.TESSL_TOKEN }}
-```
+Tessl skills are for local AI coding tools only — they are not needed in CI.
 
 ### 2. Neon Setup
 
@@ -192,12 +185,10 @@ The cleanup workflow at [`.github/workflows/cleanup.yml`](.github/workflows/clea
 |---|---|
 | `CLOUDFLARE_API_TOKEN` | Cloudflare dashboard → My Profile → API Tokens → Use the **"Edit Cloudflare Workers"** template |
 | `CLOUDFLARE_ACCOUNT_ID` | Cloudflare dashboard URL: `dash.cloudflare.com/<account-id>`, or Workers & Pages sidebar |
-| `TESSL_TOKEN` | `npx tessl auth token` |
 Add secrets via the GitHub CLI:
 ```bash
 echo "<token>" | gh secret set CLOUDFLARE_API_TOKEN --repo <owner>/<repo>
 echo "<account-id>" | gh secret set CLOUDFLARE_ACCOUNT_ID --repo <owner>/<repo>
-npx tessl auth token | gh secret set TESSL_TOKEN --repo <owner>/<repo>
 ```
 
 Or add them manually at: `https://github.com/<owner>/<repo>/settings/secrets/actions`

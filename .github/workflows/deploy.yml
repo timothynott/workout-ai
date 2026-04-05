@@ -21,11 +21,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install Tessl skills
-        run: npx tessl install --yes
-        env:
-          TESSL_TOKEN: ${{ secrets.TESSL_TOKEN }}
-
       - name: Derive worker name
         id: worker
         run: |
@@ -46,6 +41,9 @@ jobs:
 
       - name: Build
         run: pnpm cf:build
+        env:
+          NEON_AUTH_BASE_URL: http://localhost
+          NEON_AUTH_COOKIE_SECRET: placeholder-build-time-secret-not-used
 
       - name: Deploy
         run: npx wrangler deploy --name ${{ steps.worker.outputs.name }}
