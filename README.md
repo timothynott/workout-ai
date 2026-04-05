@@ -222,16 +222,16 @@ ENCRYPTION_KEY=            # openssl rand -base64 32
 
 Then:
 ```bash
-npm install
+pnpm install
 git config core.hooksPath .githooks   # one-time: enable commit message linting
-npm run dev
+pnpm dev
 ```
 
 **Drizzle commands** (used as tables are added in Phase 2+):
 
 | Command | What it does |
 |---|---|
-| `npm run db:generate` | Generate SQL migration files from schema changes |
-| `npm run db:migrate` | Apply pending migrations to the database |
-| `npm run db:push` | Prototype mode: push schema directly (no migration files) |
-| `npm run db:studio` | Open Drizzle Studio GUI |
+| `pnpm db:generate` | Generate SQL migration files from schema changes |
+| `pnpm db:migrate` | Apply pending migrations to the database |
+| `pnpm db:push` | Prototype mode: push schema directly (no migration files) |
+| `pnpm db:studio` | Open Drizzle Studio GUI |
