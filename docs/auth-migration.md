@@ -54,32 +54,75 @@ to avoid registering a new redirect URI in GCP per preview branch.
 - [x] Add shadcn CSS variables + `@import "@daveyplate/better-auth-ui/css"` to `app/globals.css`
 - [x] Create `app/providers.tsx` with `AuthUIProvider` wrapping `authClient`
 - [x] Wrap layout in `Providers`, add `<Toaster />` from sonner
-- [x] Create `app/auth/[path]/page.tsx` using `AuthView` + `generateStaticParams`
+- [x] Create `app/auth/[path]/page.tsx` as a fully dynamic route with `AuthView`
 - [x] Update `middleware.ts`: redirect to `/auth/sign-in`, exclude `/auth` in matcher
 - [x] Delete `app/sign-in/page.tsx` (replaced by `app/auth/[path]`)
-- [ ] Verify Google sign-in button, email/password form, and sign-up toggle all render correctly
-- [ ] Verify the UI wires to the BetterAuth client set up in Step 3
+- [x] Add `social={{ providers: ['google'] }}` to `AuthUIProvider` so the Google button renders
+- [x] Verify sign-in/sign-up form and sign-up toggle render correctly (confirmed on preview worker)
 
 ## Step 5 — Email Verification via Resend
 
-- [ ] Create Resend account and verify sending domain *(manual)*
-- [ ] Add `RESEND_API_KEY` and `RESEND_FROM_ADDRESS` as Cloudflare Worker secrets *(manual)*
-- [ ] Add `RESEND_API_KEY` to GitHub Actions secrets *(manual)*
-- [ ] Fill in `RESEND_API_KEY` and `RESEND_FROM_ADDRESS` in `.env.local` and `.dev.vars` *(manual)*
+- [ ] Create Resend account and verify sending domain *(manual — can defer until pre-production)*
+- [ ] Populate secrets — see Step 5.5
 - [x] `pnpm add resend`
 - [x] Add BetterAuth `emailVerification` plugin to `lib/auth/index.ts` with `sendVerificationEmail` via Resend and `sendOnSignUp: true`
 - [x] Add `RESEND_API_KEY` and `RESEND_FROM_ADDRESS` to `.env.example` and `.dev.vars`
 - [x] Add `.dev.vars` to `.gitignore`
+
+## Step 5.5 — Populate Secrets (prerequisite for Steps 6–7)
+
+All secrets must be in GitHub Actions **before** the next deploy so the
+`Set Worker secrets` workflow step can push them to every worker automatically.
+Stable workers also need them set manually once (they don't get a PR-triggered
+Neon branch event like preview workers do).
+
+### GitHub Actions secrets
+Add each secret at: **repo → Settings → Secrets and variables → Actions**
+
+```bash
+gh secret set AUTH_SECRET          --app actions
+gh secret set RESEND_API_KEY       --app actions
+gh secret set RESEND_FROM_ADDRESS  --app actions   # onboarding@resend.dev for now
+gh secret set ALLOWED_EMAILS       --app actions
+```
+
+- [ ] `AUTH_SECRET` added to GitHub Actions secrets
+- [ ] `RESEND_API_KEY` added to GitHub Actions secrets
+- [ ] `RESEND_FROM_ADDRESS` added to GitHub Actions secrets
+- [ ] `ALLOWED_EMAILS` added to GitHub Actions secrets
+
+### Stable Cloudflare Worker secrets
+Set once manually (deploy workflow will keep them in sync after this):
+
+```bash
+# workout-ai-staging
+wrangler secret put AUTH_SECRET          --name workout-ai-staging
+wrangler secret put RESEND_API_KEY       --name workout-ai-staging
+wrangler secret put RESEND_FROM_ADDRESS  --name workout-ai-staging
+wrangler secret put ALLOWED_EMAILS       --name workout-ai-staging
+
+# workout-ai (production)
+wrangler secret put AUTH_SECRET          --name workout-ai
+wrangler secret put RESEND_API_KEY       --name workout-ai
+wrangler secret put RESEND_FROM_ADDRESS  --name workout-ai
+wrangler secret put ALLOWED_EMAILS       --name workout-ai
+```
+
+- [ ] Secrets set on `workout-ai-staging`
+- [ ] Secrets set on `workout-ai` (production)
+
+### Local dev
+- [ ] Fill `AUTH_SECRET`, `RESEND_API_KEY`, `RESEND_FROM_ADDRESS`, `ALLOWED_EMAILS` in `.env.local` and `.dev.vars`
+- [ ] Verify end-to-end auth flow on preview worker: sign-up, sign-in, email verification email received
 
 ## Step 6 — Google OAuth
 
 - [ ] Update authorized redirect URI in Google Cloud Console from Neon Auth callback → `<app-url>/api/auth/callback/google`
   - Staging: `https://workout-staging.<account>.workers.dev/api/auth/callback/google`
   - Production: `https://<custom-domain>/api/auth/callback/google`
-- [ ] Add `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` as Cloudflare Worker secrets
-- [ ] Add `AUTH_SECRET` (random 32+ char string) as a Cloudflare Worker secret
-- [ ] Add all three to `.dev.vars` and `.env.local` for local development (do not commit)
-- [ ] Add `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `AUTH_SECRET` to GitHub Actions secrets (needed at runtime, verify if build-time placeholder required)
+- [ ] Add `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` as Cloudflare Worker secrets on `workout-ai-staging` and `workout-ai`
+- [ ] Add `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` to `.dev.vars` and `.env.local`
+- [ ] Add `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` to GitHub Actions secrets
 
 ## Step 7 — Documentation Updates
 
