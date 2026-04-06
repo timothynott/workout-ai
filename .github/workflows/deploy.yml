@@ -52,14 +52,16 @@ jobs:
 
       - name: Set Worker secrets
         run: |
-          jq -n \
-            --arg auth    "$AUTH_SECRET" \
-            --arg rkey    "$RESEND_API_KEY" \
-            --arg rfrom   "$RESEND_FROM_ADDRESS" \
-            --arg emails  "$ALLOWED_EMAILS" \
-            '{"AUTH_SECRET":$auth,"RESEND_API_KEY":$rkey,"RESEND_FROM_ADDRESS":$rfrom,"ALLOWED_EMAILS":$emails}
-             | with_entries(select(.value != ""))' \
-          | npx wrangler secret:bulk --name ${{ steps.worker.outputs.name }}
+          WORKER="${{ steps.worker.outputs.name }}"
+          push_secret() {
+            local key=$1 val=$2
+            [ -z "$val" ] && return
+            echo "$val" | npx wrangler secret put "$key" --name "$WORKER"
+          }
+          push_secret AUTH_SECRET         "$AUTH_SECRET"
+          push_secret RESEND_API_KEY      "$RESEND_API_KEY"
+          push_secret RESEND_FROM_ADDRESS "$RESEND_FROM_ADDRESS"
+          push_secret ALLOWED_EMAILS      "$ALLOWED_EMAILS"
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
