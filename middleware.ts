@@ -1,8 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { getSessionCookie } from 'better-auth/cookies';
 
-export const runtime = 'edge';
-
 export default function middleware(request: NextRequest) {
   const session = getSessionCookie(request);
   if (!session) {

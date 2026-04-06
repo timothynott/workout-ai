@@ -4,8 +4,6 @@ import { cloudflare } from 'better-auth-cloudflare';
 import { Resend } from 'resend';
 import { db } from '@/lib/db';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export const auth = betterAuth({
   secret: process.env.AUTH_SECRET,
   database: drizzleAdapter(db, { provider: 'pg' }),
@@ -17,7 +15,7 @@ export const auth = betterAuth({
   emailVerification: {
     sendOnSignUp: true,
     async sendVerificationEmail({ user, url }) {
-      await resend.emails.send({
+      await new Resend(process.env.RESEND_API_KEY).emails.send({
         from: process.env.RESEND_FROM_ADDRESS ?? 'onboarding@resend.dev',
         to: user.email,
         subject: 'Verify your email',
