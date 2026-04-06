@@ -20,7 +20,7 @@
   - [x] Register app in Google Cloud Console, create OAuth 2.0 Client ID, add redirect URI (`/api/auth/callback/google`)
   - [x] Publish app in Google Cloud Console OAuth consent screen (moves out of testing mode)
   - [x] Paste Client ID + Secret into Neon Auth dashboard → OAuth Providers
-- [ ] Create Resend account, configure domain, and configure as custom SMTP in Neon Auth dashboard
+- [ ] Create Resend account and verify sending domain (update `RESEND_FROM_ADDRESS` from `onboarding@resend.dev` to verified address before production)
 - [x] Enable email verification in Neon Auth dashboard (Auth → Configuration → Email verification)
 - [x] Set up Drizzle ORM + schema migrations
 - [ ] Configure Vercel AI SDK + provider abstraction

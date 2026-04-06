@@ -62,8 +62,6 @@ to avoid registering a new redirect URI in GCP per preview branch.
 
 ## Step 5 — Email Verification via Resend
 
-- [ ] Create Resend account and verify sending domain *(manual — can defer until pre-production)*
-- [ ] Populate secrets — see Step 5.5
 - [x] `pnpm add resend`
 - [x] Add BetterAuth `emailVerification` plugin to `lib/auth/index.ts` with `sendVerificationEmail` via Resend and `sendOnSignUp: true`
 - [x] Add `RESEND_API_KEY` and `RESEND_FROM_ADDRESS` to `.env.example` and `.dev.vars`
