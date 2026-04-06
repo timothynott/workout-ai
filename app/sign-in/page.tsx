@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { authClient } from '@/lib/auth/client';
 
 export default function SignInPage() {
   const router = useRouter();
@@ -12,9 +13,11 @@ export default function SignInPage() {
   async function handleGoogleSignIn() {
     setError(null);
     setPending(true);
-    // TODO(Step 3): replace with BetterAuth client signIn.social call
-    setError('Google sign-in not yet configured.');
-    setPending(false);
+    const { error } = await authClient.signIn.social({ provider: 'google', callbackURL: '/' });
+    if (error) {
+      setError(error.message ?? 'Google sign-in failed.');
+      setPending(false);
+    }
   }
 
   const isSignIn = mode === 'sign-in';
@@ -25,24 +28,29 @@ export default function SignInPage() {
     setPending(true);
 
     const form = new FormData(e.currentTarget);
-    const body = isSignIn
-      ? { email: form.get('email'), password: form.get('password') }
-      : { email: form.get('email'), password: form.get('password'), name: form.get('name') };
 
-    const res = await fetch(isSignIn ? '/api/sign-in' : '/api/sign-up', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-
-    if (!res.ok) {
-      const data = await res.json();
-      setError(data.error ?? 'Something went wrong.');
-      setPending(false);
-      return;
+    if (isSignIn) {
+      const { error } = await authClient.signIn.email({
+        email: form.get('email') as string,
+        password: form.get('password') as string,
+        callbackURL: '/',
+      });
+      if (error) {
+        setError(error.message ?? 'Sign-in failed.');
+        setPending(false);
+      }
+    } else {
+      const { error } = await authClient.signUp.email({
+        email: form.get('email') as string,
+        password: form.get('password') as string,
+        name: form.get('name') as string,
+        callbackURL: '/',
+      });
+      if (error) {
+        setError(error.message ?? 'Sign-up failed.');
+        setPending(false);
+      }
     }
-
-    router.push('/');
   }
 
   return (

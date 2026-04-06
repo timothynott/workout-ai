@@ -37,18 +37,25 @@ to avoid registering a new redirect URI in GCP per preview branch.
 
 ## Step 3 — Install BetterAuth
 
-- [ ] `pnpm add better-auth better-auth-cloudflare`
-- [ ] Create `lib/auth/index.ts` — BetterAuth server config with:
+- [x] `pnpm add better-auth better-auth-cloudflare`
+- [x] Create `lib/auth/index.ts` — BetterAuth server config with:
   - Neon Postgres adapter (using existing `DATABASE_URL`)
   - Google OAuth social provider
-  - `betterAuthCloudflare()` plugin for edge compatibility
-- [ ] Create `lib/auth/client.ts` — `createAuthClient()` for use in client components
-- [ ] Create `app/api/auth/[...all]/route.ts` — BetterAuth catch-all route handler
-- [ ] Create `middleware.ts` (edge runtime) — session check using BetterAuth session cookie
-- [ ] Run BetterAuth DB migration to create auth tables in Neon (`npx better-auth migrate` or generate Drizzle migration)
-- [ ] Update `app/sign-in/page.tsx` — replace Neon Auth client calls with BetterAuth client
+  - `cloudflare()` plugin for edge compatibility
+- [x] Create `lib/auth/client.ts` — `createAuthClient()` for use in client components
+- [x] Create `app/api/auth/[...all]/route.ts` — BetterAuth catch-all route handler
+- [x] Create `middleware.ts` (edge runtime) — session check using BetterAuth session cookie
+- [x] Run BetterAuth DB migration to create auth tables in Neon (used `pnpm dlx @better-auth/cli generate` + `drizzle-kit push`)
+- [x] Update `app/sign-in/page.tsx` — replace Neon Auth client calls with BetterAuth client
 
-## Step 4 — Email Verification via Resend
+## Step 4 — Better Auth UI Components
+
+- [ ] Install `@better-auth/ui` and its peer dependencies
+- [ ] Replace the hand-rolled `app/sign-in/page.tsx` form with Better Auth UI's pre-built sign-in/sign-up component
+- [ ] Verify Google sign-in button, email/password form, and sign-up toggle all render correctly
+- [ ] Verify the UI wires to the BetterAuth client set up in Step 3
+
+## Step 5 — Email Verification via Resend
 
 - [ ] Create Resend account and verify sending domain
 - [ ] Add `RESEND_API_KEY` as a Cloudflare Worker secret and to `.dev.vars` / `.env.local`
@@ -78,6 +85,8 @@ to avoid registering a new redirect URI in GCP per preview branch.
 ---
 
 ## Notes
+
+- `ALLOWED_EMAILS` gate (previously in `app/api/sign-up/route.ts`) needs to be re-implemented as a BetterAuth `before` hook on user creation. Temporary gap until Phase 2 quota gating is built.
 
 - `middleware.ts` with `export const runtime = 'edge'` is intentionally kept working in Next.js 16 during transition. Migrate to `proxy.ts` once opennextjs/opennextjs-cloudflare#962 is resolved.
 - Phase 2 (signup quota gating) webhook references `neon_auth.users` — this will need updating to query BetterAuth's `user` table instead.
