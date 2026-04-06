@@ -1,7 +1,10 @@
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { cloudflare } from 'better-auth-cloudflare';
+import { Resend } from 'resend';
 import { db } from '@/lib/db';
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const auth = betterAuth({
   secret: process.env.AUTH_SECRET,
@@ -10,6 +13,17 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
+  },
+  emailVerification: {
+    sendOnSignUp: true,
+    async sendVerificationEmail({ user, url }) {
+      await resend.emails.send({
+        from: process.env.RESEND_FROM_ADDRESS ?? 'onboarding@resend.dev',
+        to: user.email,
+        subject: 'Verify your email',
+        html: `<p>Click <a href="${url}">here</a> to verify your email address.</p>`,
+      });
+    },
   },
   socialProviders: {
     google: {

@@ -54,3 +54,6 @@ next-env.d.ts
 
 # wrangler local state
 /.wrangler/
+
+# wrangler local secrets (mirrors Cloudflare Worker secrets for `wrangler dev`)
+.dev.vars

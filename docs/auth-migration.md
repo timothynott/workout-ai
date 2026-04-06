@@ -62,13 +62,14 @@ to avoid registering a new redirect URI in GCP per preview branch.
 
 ## Step 5 — Email Verification via Resend
 
-- [ ] Create Resend account and verify sending domain
-- [ ] Add `RESEND_API_KEY` as a Cloudflare Worker secret and to `.dev.vars` / `.env.local`
-- [ ] Add `resend` package: `pnpm add resend`
-- [ ] Add BetterAuth `emailVerification` plugin to `lib/auth/index.ts` with a `sendVerificationEmail` function that calls the Resend API
-- [ ] Set `sendOnSignUp: true` so verification emails are triggered automatically on registration
-- [ ] Add `RESEND_API_KEY` to GitHub Actions secrets
-- [ ] Add `RESEND_FROM_ADDRESS` to `.env.example`, `.dev.vars`, and Cloudflare Worker secrets
+- [ ] Create Resend account and verify sending domain *(manual)*
+- [ ] Add `RESEND_API_KEY` and `RESEND_FROM_ADDRESS` as Cloudflare Worker secrets *(manual)*
+- [ ] Add `RESEND_API_KEY` to GitHub Actions secrets *(manual)*
+- [ ] Fill in `RESEND_API_KEY` and `RESEND_FROM_ADDRESS` in `.env.local` and `.dev.vars` *(manual)*
+- [x] `pnpm add resend`
+- [x] Add BetterAuth `emailVerification` plugin to `lib/auth/index.ts` with `sendVerificationEmail` via Resend and `sendOnSignUp: true`
+- [x] Add `RESEND_API_KEY` and `RESEND_FROM_ADDRESS` to `.env.example` and `.dev.vars`
+- [x] Add `.dev.vars` to `.gitignore`
 
 ## Step 6 — Google OAuth
 

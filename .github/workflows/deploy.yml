@@ -50,6 +50,25 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
+      - name: Set Worker secrets
+        run: |
+          python3 -c "
+import json, os
+print(json.dumps({
+    'AUTH_SECRET':         os.environ['AUTH_SECRET'],
+    'RESEND_API_KEY':      os.environ['RESEND_API_KEY'],
+    'RESEND_FROM_ADDRESS': os.environ['RESEND_FROM_ADDRESS'],
+    'ALLOWED_EMAILS':      os.environ['ALLOWED_EMAILS'],
+}))
+" | npx wrangler secret:bulk --name ${{ steps.worker.outputs.name }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          AUTH_SECRET:          ${{ secrets.AUTH_SECRET }}
+          RESEND_API_KEY:       ${{ secrets.RESEND_API_KEY }}
+          RESEND_FROM_ADDRESS:  ${{ secrets.RESEND_FROM_ADDRESS }}
+          ALLOWED_EMAILS:       ${{ secrets.ALLOWED_EMAILS }}
+
       - name: Print worker name
         env:
           WORKER_NAME: ${{ steps.worker.outputs.name }}
