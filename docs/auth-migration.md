@@ -50,8 +50,13 @@ to avoid registering a new redirect URI in GCP per preview branch.
 
 ## Step 4 — Better Auth UI Components
 
-- [ ] Install `@better-auth/ui` and its peer dependencies
-- [ ] Replace the hand-rolled `app/sign-in/page.tsx` form with Better Auth UI's pre-built sign-in/sign-up component
+- [x] Install `@daveyplate/better-auth-ui` and peer dependencies (lucide-react, sonner, radix-ui/*,  react-hook-form, zod, clsx, tailwind-merge, class-variance-authority, input-otp)
+- [x] Add shadcn CSS variables + `@import "@daveyplate/better-auth-ui/css"` to `app/globals.css`
+- [x] Create `app/providers.tsx` with `AuthUIProvider` wrapping `authClient`
+- [x] Wrap layout in `Providers`, add `<Toaster />` from sonner
+- [x] Create `app/auth/[path]/page.tsx` using `AuthView` + `generateStaticParams`
+- [x] Update `middleware.ts`: redirect to `/auth/sign-in`, exclude `/auth` in matcher
+- [x] Delete `app/sign-in/page.tsx` (replaced by `app/auth/[path]`)
 - [ ] Verify Google sign-in button, email/password form, and sign-up toggle all render correctly
 - [ ] Verify the UI wires to the BetterAuth client set up in Step 3
 

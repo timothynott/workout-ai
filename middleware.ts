@@ -6,7 +6,7 @@ export const runtime = 'edge';
 export default function middleware(request: NextRequest) {
   const session = getSessionCookie(request);
   if (!session) {
-    const signIn = new URL('/sign-in', request.url);
+    const signIn = new URL('/auth/sign-in', request.url);
     signIn.searchParams.set('redirect', request.nextUrl.pathname);
     return NextResponse.redirect(signIn);
   }
@@ -15,6 +15,6 @@ export default function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|sign-in|api/auth).*)',
+    '/((?!_next/static|_next/image|favicon.ico|auth|api/auth).*)',
   ],
 };
