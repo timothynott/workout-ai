@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { authClient } from '@/lib/auth/client';
 
 export default function SignInPage() {
   const router = useRouter();
@@ -13,11 +12,9 @@ export default function SignInPage() {
   async function handleGoogleSignIn() {
     setError(null);
     setPending(true);
-    const { error } = await authClient.signIn.social({ provider: 'google', callbackURL: '/' });
-    if (error) {
-      setError(error.message ?? 'Google sign-in failed.');
-      setPending(false);
-    }
+    // TODO(Step 3): replace with BetterAuth client signIn.social call
+    setError('Google sign-in not yet configured.');
+    setPending(false);
   }
 
   const isSignIn = mode === 'sign-in';

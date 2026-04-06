@@ -26,6 +26,8 @@ jobs:
         run: |
           if [ "$GITHUB_REF_NAME" = "main" ]; then
             NAME="workout-ai"
+          elif [ "$GITHUB_REF_NAME" = "staging" ]; then
+            NAME="workout-ai-staging"
           else
             SANITIZED=$(echo "$GITHUB_REF_NAME" \
               | tr '[:upper:]' '[:lower:]' \
@@ -41,9 +43,6 @@ jobs:
 
       - name: Build
         run: pnpm cf:build
-        env:
-          NEON_AUTH_BASE_URL: http://localhost
-          NEON_AUTH_COOKIE_SECRET: placeholder-build-time-secret-not-used
 
       - name: Deploy
         run: npx wrangler deploy --name ${{ steps.worker.outputs.name }}

@@ -16,24 +16,24 @@ to avoid registering a new redirect URI in GCP per preview branch.
 
 ## Step 1 — GitHub Branch Strategy
 
-- [ ] Create `staging` branch from `main`
-- [ ] Set `staging` as the default base branch for new PRs (GitHub Settings → General → Default branch... or via branch protection)
-- [ ] Add branch protection rule on `main`:
+- [x] Create `staging` branch from `main`
+- [x] Set `staging` as the default base branch for new PRs
+- [x] Add branch protection rule on `main`:
   - Restrict merges to `staging` branch and branches matching `hotfix-*`
   - Require PR before merging
-- [ ] Add branch protection rule on `staging`:
+- [x] Add branch protection rule on `staging`:
   - Require PR before merging
   - Require status checks (CI) to pass
-- [ ] Update deploy workflow if needed so `staging` deploys to a stable staging worker
+- [x] Update deploy workflow so `staging` deploys to stable worker `workout-ai-staging`
 
 ## Step 2 — Remove Neon Auth
 
-- [ ] `pnpm remove @neondatabase/auth`
-- [ ] Delete `lib/auth/client.ts`
-- [ ] Delete `proxy.ts`
-- [ ] Remove Neon Auth placeholder env vars from `.github/workflows/deploy.yml` (`NEON_AUTH_BASE_URL`, `NEON_AUTH_COOKIE_SECRET`)
-- [ ] Remove `NEON_AUTH_COOKIE_SECRET` from Cloudflare Worker secrets (wrangler dashboard or CLI)
-- [ ] Remove Neon Auth sign-in logic from `app/sign-in/page.tsx`
+- [x] `pnpm remove @neondatabase/auth`
+- [x] Delete `lib/auth/client.ts`
+- [x] Delete `proxy.ts`
+- [x] Remove Neon Auth placeholder env vars from `.github/workflows/deploy.yml` (`NEON_AUTH_BASE_URL`, `NEON_AUTH_COOKIE_SECRET`)
+- [x] Remove `NEON_AUTH_COOKIE_SECRET` + `NEON_AUTH_BASE_URL` from Cloudflare Worker secrets (confirmed not present)
+- [x] Remove Neon Auth sign-in logic from `app/sign-in/page.tsx`
 
 ## Step 3 — Install BetterAuth
 
@@ -48,7 +48,17 @@ to avoid registering a new redirect URI in GCP per preview branch.
 - [ ] Run BetterAuth DB migration to create auth tables in Neon (`npx better-auth migrate` or generate Drizzle migration)
 - [ ] Update `app/sign-in/page.tsx` — replace Neon Auth client calls with BetterAuth client
 
-## Step 4 — Google OAuth
+## Step 4 — Email Verification via Resend
+
+- [ ] Create Resend account and verify sending domain
+- [ ] Add `RESEND_API_KEY` as a Cloudflare Worker secret and to `.dev.vars` / `.env.local`
+- [ ] Add `resend` package: `pnpm add resend`
+- [ ] Add BetterAuth `emailVerification` plugin to `lib/auth/index.ts` with a `sendVerificationEmail` function that calls the Resend API
+- [ ] Set `sendOnSignUp: true` so verification emails are triggered automatically on registration
+- [ ] Add `RESEND_API_KEY` to GitHub Actions secrets
+- [ ] Add `RESEND_FROM_ADDRESS` to `.env.example`, `.dev.vars`, and Cloudflare Worker secrets
+
+## Step 6 — Google OAuth
 
 - [ ] Update authorized redirect URI in Google Cloud Console from Neon Auth callback → `<app-url>/api/auth/callback/google`
   - Staging: `https://workout-staging.<account>.workers.dev/api/auth/callback/google`
@@ -58,7 +68,7 @@ to avoid registering a new redirect URI in GCP per preview branch.
 - [ ] Add all three to `.dev.vars` and `.env.local` for local development (do not commit)
 - [ ] Add `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `AUTH_SECRET` to GitHub Actions secrets (needed at runtime, verify if build-time placeholder required)
 
-## Step 5 — Documentation Updates
+## Step 7 — Documentation Updates
 
 - [ ] `docs/decisions.md` — record auth migration decision and rationale
 - [ ] `docs/overview.md` — update auth architecture section
