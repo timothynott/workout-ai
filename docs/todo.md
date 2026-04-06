@@ -28,6 +28,8 @@
 - [ ] Initialize shadcn/ui (`npx shadcn@latest init`)
 - [ ] Configure PWA manifest and service worker (next-pwa or similar)
 - [ ] Set up Cloudflare secrets (`ALLOWED_EMAILS`, `ENCRYPTION_KEY`)
+- [ ] Set up public `/blog` route: MDX-based posts, index page, per-post pages
+- [ ] Write Phase 1 blog post: scaffold decisions, blockers encountered, and how they were resolved
 
 ## Phase 2 — Signup Quota Gating
 - [ ] Create `lib/quota.ts` with `QUOTA` constants: `daily` (100) and `monthly` (3000) — update here when upgrading Resend plan
@@ -35,6 +37,7 @@
 - [ ] Create `user.before_create` webhook handler at `app/webhooks/neon-auth/route.ts`: verify Neon Auth webhook signature, call `checkSignupQuota`, return `{ allowed: true/false }` with `error_code` and `error_message`
 - [ ] Register webhook with Neon Auth API, subscribing to `user.before_create` pointing at deployed webhook URL
 - [ ] Update signup UI to surface quota error codes (`daily_limit`, `monthly_limit`) with user-friendly messaging
+- [ ] Write Phase 2 blog post: quota gating design, webhook approach, and lessons learned
 
 ## Phase 3 — Onboarding
 - [ ] Add encryption/decryption utility for sensitive fields (`/lib/crypto.ts`, AES-256-GCM, key from `ENCRYPTION_KEY` secret)
@@ -48,12 +51,14 @@
 - [ ] If weight loss goal selected: prompt for goal weight and current weight
 - [ ] Save profile to DB
 - [ ] Trigger initial AI plan generation on completion
+- [ ] Write Phase 3 blog post: onboarding UX decisions, schema evolution, and lessons learned
 
 ## Phase 4 — Workout Plan & Session Views
 - [ ] Dashboard: upcoming sessions calendar/list view
 - [ ] Session detail: warm-up / exercises / cool-down summary
 - [ ] Start / Postpone CTA
 - [ ] Postpone flow: pick delay → update scheduled date
+- [ ] Write Phase 4 blog post: plan and session view design, component decisions, and lessons learned
 
 ## Phase 5 — Active Session (Workout Player)
 - [ ] Schema: add `session_feedback` table (post-session ratings and completion data) + migrate
@@ -64,11 +69,13 @@
 - [ ] YouTube embed per exercise
 - [ ] Post-exercise micro-feedback (completed? how much?)
 - [ ] Post-session rating (too easy / just right / too hard)
+- [ ] Write Phase 5 blog post: workout player architecture, timer/stepper mechanics, and lessons learned
 
 ## Phase 6 — AI Feedback Loop
 - [ ] Store all session + exercise feedback
 - [ ] Feed feedback history into AI when generating next session
 - [ ] AI adjusts sets / reps / duration / exercise selection accordingly
+- [ ] Write Phase 6 blog post: AI feedback loop design, prompt engineering decisions, and lessons learned
 
 ## Phase 7 — Progress Charts
 - [ ] Schema: add `weigh_ins` table (user, date, weight — weight-loss goal users only) + migrate
@@ -78,12 +85,14 @@
 - [ ] Volume over time
 - [ ] Weekly weigh-in prompt (weight-loss goal users only)
 - [ ] Weight over time chart (weight-loss goal users only)
+- [ ] Write Phase 7 blog post: charting library choices, data modeling for progress, and lessons learned
 
 ## Phase 8 — Polish & Deploy
 - [ ] Mobile-first responsive UI pass
 - [ ] PWA install prompt
 - [ ] Deploy to Cloudflare Workers (production)
 - [ ] Smoke test on real phone
+- [ ] Write Phase 8 blog post: PWA setup, production deploy experience, and lessons learned
 
 ## Phase 9 — Google OAuth Verification & Branding
 - [ ] Decide on a final app name
@@ -94,3 +103,4 @@
 - [ ] Update Google Cloud Console OAuth consent screen with final name, logo, homepage, privacy policy, and ToS URLs
 - [ ] Submit app for Google OAuth verification
 - [ ] Mark consent screen verification sub-task complete in Phase 1 once approved
+- [ ] Write Phase 9 blog post: branding process, OAuth verification journey, and lessons learned
