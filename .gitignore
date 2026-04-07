@@ -57,3 +57,6 @@ next-env.d.ts
 
 # wrangler local secrets (mirrors Cloudflare Worker secrets for `wrangler dev`)
 .dev.vars
+
+# neonctl local config
+.neon

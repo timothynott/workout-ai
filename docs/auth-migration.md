@@ -84,10 +84,10 @@ gh secret set RESEND_FROM_ADDRESS  --app actions   # onboarding@resend.dev for n
 gh secret set ALLOWED_EMAILS       --app actions
 ```
 
-- [ ] `AUTH_SECRET` added to GitHub Actions secrets
-- [ ] `RESEND_API_KEY` added to GitHub Actions secrets
-- [ ] `RESEND_FROM_ADDRESS` added to GitHub Actions secrets
-- [ ] `ALLOWED_EMAILS` added to GitHub Actions secrets
+- [x] `AUTH_SECRET` added to GitHub Actions secrets
+- [x] `RESEND_API_KEY` added to GitHub Actions secrets
+- [x] `RESEND_FROM_ADDRESS` added to GitHub Actions secrets
+- [x] `ALLOWED_EMAILS` added to GitHub Actions secrets
 
 ### Stable Cloudflare Worker secrets
 Set once manually (deploy workflow will keep them in sync after this):
@@ -106,12 +106,13 @@ wrangler secret put RESEND_FROM_ADDRESS  --name workout-ai
 wrangler secret put ALLOWED_EMAILS       --name workout-ai
 ```
 
-- [ ] Secrets set on `workout-ai-staging`
-- [ ] Secrets set on `workout-ai` (production)
+- [x] Secrets set on `workout-ai-staging`
+- [x] Secrets set on `workout-ai` (production)
 
 ### Local dev
-- [ ] Fill `AUTH_SECRET`, `RESEND_API_KEY`, `RESEND_FROM_ADDRESS`, `ALLOWED_EMAILS` in `.env.local` and `.dev.vars`
-- [ ] Verify end-to-end auth flow on preview worker: sign-up, sign-in, email verification email received
+- [x] Fill `AUTH_SECRET`, `RESEND_API_KEY`, `RESEND_FROM_ADDRESS`, `ALLOWED_EMAILS` in `.env.local` and `.dev.vars`
+- [x] Verify end-to-end auth flow locally: sign-up and sign-in working with email/password
+- [ ] Verify end-to-end auth flow on preview worker (requires push + Neon branch via PR)
 
 ## Step 6 — Google OAuth
 
