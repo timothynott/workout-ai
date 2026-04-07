@@ -58,6 +58,22 @@ jobs:
           NAME="workout-ai-${SANITIZED}"
           echo "name=${NAME:0:63}" >> $GITHUB_OUTPUT
 
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Push schema to Neon preview branch
+        run: pnpm db:push
+        env:
+          DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
+
       - name: Set DATABASE_URL on preview Worker
         run: echo "$DB_URL" | npx wrangler secret put DATABASE_URL --name ${{ steps.worker.outputs.name }}
         env:

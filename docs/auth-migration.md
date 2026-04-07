@@ -112,7 +112,7 @@ wrangler secret put ALLOWED_EMAILS       --name workout-ai
 ### Local dev
 - [x] Fill `AUTH_SECRET`, `RESEND_API_KEY`, `RESEND_FROM_ADDRESS`, `ALLOWED_EMAILS` in `.env.local` and `.dev.vars`
 - [x] Verify end-to-end auth flow locally: sign-up and sign-in working with email/password
-- [ ] Verify end-to-end auth flow on preview worker (requires push + Neon branch via PR)
+- [x] Verify end-to-end auth flow on preview worker (requires push + Neon branch via PR)
 
 ## Step 6 — Google OAuth
 
