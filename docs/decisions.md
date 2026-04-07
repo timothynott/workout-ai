@@ -1,9 +1,9 @@
 # Architecture Decision Records
 
-## ADR-014: Signup Quota Gating — `user.before_create` Webhook
-**Status:** Accepted
+## ADR-014: Signup Quota Gating — BetterAuth `before` Hook
+**Status:** Accepted (updated — migrated from Neon Auth webhook)
 
-Signups are rate-limited to protect Resend's free-tier email quota. A `user.before_create` webhook from Neon Auth calls a server-side handler that queries `neon_auth.users` for daily and monthly signup counts and rejects the request if either limit is exceeded.
+Signups are rate-limited to protect Resend's free-tier email quota. A BetterAuth `before` hook on user creation queries the BetterAuth `user` table for daily and monthly signup counts and rejects the request if either limit is exceeded.
 
 Quota constants live in `lib/quota.ts` (`daily: 100`, `monthly: 3000`) so limits can be updated in one place when the Resend plan changes. Error codes (`daily_limit`, `monthly_limit`) are surfaced to the user in the signup UI.
 
@@ -12,7 +12,7 @@ Quota constants live in `lib/quota.ts` (`daily: 100`, `monthly: 3000`) so limits
 ## ADR-013: Transactional Email — Resend
 **Status:** Accepted
 
-[Resend](https://resend.com) is the transactional email provider for all auth-related emails (signup verification OTP, passwordless sign-in, password reset). SMTP credentials are stored as Cloudflare secrets.
+[Resend](https://resend.com) is the transactional email provider for auth emails (signup verification). Integrated via the BetterAuth `emailVerification` plugin in `lib/auth/index.ts` using Resend's Node SDK — no SMTP configuration needed. `RESEND_API_KEY` and `RESEND_FROM_ADDRESS` are stored as Cloudflare secrets and GitHub Actions secrets.
 
 ---
 
@@ -36,10 +36,14 @@ Next.js deployed to **Cloudflare Workers** using [`@opennextjs/cloudflare`](http
 
 ---
 
-## ADR-002: Authentication — Neon Auth
-**Status:** Accepted
+## ADR-002: Authentication — Self-Hosted BetterAuth
+**Status:** Accepted (updated — migrated from Neon Auth)
 
-[Neon Auth](https://neon.com/docs/auth/overview) (a managed auth service, now built on BetterAuth) for authentication. Signups are restricted to a configurable allowlist of email addresses stored as a Cloudflare secret.
+[BetterAuth](https://better-auth.com) self-hosted with a Neon Postgres adapter. Originally used Neon Auth (a managed auth service built on BetterAuth), but migrated because Neon Auth's middleware has a Node.js `crypto` dependency that is not edge-compatible, and Neon Auth's `proxy.ts` approach is not supported by `@opennextjs/cloudflare` (issue #962). Self-hosted BetterAuth stores auth tables directly in our Neon DB, so branch-level auth isolation is automatic — no extra configuration needed.
+
+Auth is configured in `lib/auth/index.ts` (server) and `lib/auth/client.ts` (React client). UI components are provided by `@daveyplate/better-auth-ui`. The `middleware.ts` edge runtime checks the BetterAuth session cookie and redirects unauthenticated requests to `/auth/sign-in`.
+
+Signups are restricted to a configurable allowlist of email addresses stored as a Cloudflare secret (`ALLOWED_EMAILS`).
 
 ---
 
@@ -114,11 +118,12 @@ Neon branches map to deployment environments:
 
 | Environment | Neon Branch | Cloudflare Deployment |
 |---|---|---|
-| Production | `main` | Pages production |
-| Preview | `preview/[git-branch]` (auto-created) | Pages preview |
+| Production | `main` | `workout-ai` Worker |
+| Staging | `staging` (manual) | `workout-ai-staging` Worker |
+| Preview | `preview/pr-<n>-<branch>` (auto-created) | `workout-ai-<branch>` Worker |
 | Local | `dev/[your-name]` (manually created) | n/a |
 
-Preview branches are created and deleted automatically via the [Neon GitHub integration](https://neon.com/docs/guides/neon-github-integration). Each preview deployment on Cloudflare Pages receives its own `DATABASE_URL` pointing to the corresponding Neon branch, set via a GitHub Actions step that calls the Cloudflare API. This ensures preview deployments never touch production data.
+Preview branches are created and deleted automatically via the GitHub Actions workflow at `.github/workflows/neon_branches.yml` (using `neondatabase/create-branch-action`). The workflow also runs `drizzle-kit push` to apply the current schema to the preview branch and sets `DATABASE_URL` on the matching preview Worker. This ensures preview deployments never touch production data, and because BetterAuth tables live in the same Neon DB, auth users are also isolated per branch.
 
 ---
 

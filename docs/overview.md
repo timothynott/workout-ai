@@ -6,8 +6,8 @@
 |---|---|
 | Framework | Next.js (App Router) |
 | Deployment | Cloudflare Workers via `@opennextjs/cloudflare` |
-| Auth | Neon Auth (BetterAuth) |
-| Email | Resend (transactional — OTP, password reset) |
+| Auth | BetterAuth (self-hosted, Neon Postgres adapter) |
+| Email | Resend (transactional — signup verification) |
 | Database | Neon Postgres |
 | AI | Vercel AI SDK (model-agnostic) |
 | Exercise videos | YouTube iframe embeds |
@@ -31,8 +31,8 @@ Next.js App (Cloudflare Workers / OpenNext)
     ├── /components           UI components
     └── /lib
         ├── /ai               Vercel AI SDK provider abstraction
-        ├── /db               Neon Postgres client (via drizzle or postgres.js)
-        └── /auth             Neon Auth helpers
+        ├── /db               Neon Postgres client (Drizzle + Neon serverless)
+        └── /auth             BetterAuth server config + React client
 ```
 
 ## Core Domain Concepts
@@ -103,21 +103,24 @@ Private org-level skills will be added to encode project-specific Cloudflare con
 Neon branches isolate data across environments so preview and local work never touches production.
 
 ```
-Neon: main branch          ← production (Cloudflare Pages production deployment)
-Neon: preview/[branch]     ← auto-created per git branch (Cloudflare Pages preview)
-Neon: dev/[your-name]      ← manually created for local development
+Neon: main branch               ← production (workout-ai Worker)
+Neon: preview/pr-<n>-<branch>   ← auto-created per PR (workout-ai-<branch> Worker)
+Neon: dev/[your-name]           ← manually created for local development
 ```
 
 **How it works:**
-- The [Neon GitHub integration](https://neon.com/docs/guides/neon-github-integration) automatically creates and deletes a Neon branch for each PR/git branch.
-- A GitHub Actions step sets the `DATABASE_URL` environment variable for the matching Cloudflare Pages preview deployment via the Cloudflare API.
+- `.github/workflows/neon_branches.yml` creates a Neon branch per PR, runs `drizzle-kit push` to apply the current schema, and sets `DATABASE_URL` on the matching preview Worker.
+- The branch is deleted automatically when the PR is closed.
 - Locally, each developer creates their own branch (`neon branch create --name dev/yourname`) and sets `DATABASE_URL` in `.env.local`.
+- Because BetterAuth auth tables live in the same Neon DB, auth users are isolated per branch automatically.
 
 ## Auth & Access Control
 
-- Neon Auth handles signup/login flows
+- BetterAuth handles signup/login flows (email+password with verification, Google OAuth)
+- Auth tables (`user`, `session`, `account`, `verification`) live in the Neon Postgres database
+- UI components from `@daveyplate/better-auth-ui` render at `/auth/[path]`
+- `middleware.ts` (edge runtime) checks the BetterAuth session cookie and redirects unauthenticated requests to `/auth/sign-in`
 - Allowed email addresses are stored as a Cloudflare secret (`ALLOWED_EMAILS`, comma-separated)
-- Middleware checks the authenticated user's email against the allowlist on every request
 
 ## AI Provider Abstraction
 

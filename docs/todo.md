@@ -14,14 +14,14 @@
 - [x] Create local dev Neon branch (`neon branch create --name dev/yourname`)
 - [x] Configure Neon GitHub integration for automatic preview branch creation
 - [x] Add GitHub Actions workflow to set `DATABASE_URL` on Cloudflare Workers preview deployments
-- [x] Install and configure Neon Auth (BetterAuth)
-- [x] Add Google as an identity provider (OAuth via Neon Auth)
-  - [x] Add `authClient.signIn.social` + Google button to sign-in page
+- [x] Install and configure BetterAuth (self-hosted, Neon Postgres adapter, edge-compatible via `better-auth-cloudflare`)
+- [x] Add Google as an identity provider (Google OAuth via BetterAuth `socialProviders`)
+  - [x] Add `authClient.signIn.social` + Google button via `AuthUIProvider` social prop
   - [x] Register app in Google Cloud Console, create OAuth 2.0 Client ID, add redirect URI (`/api/auth/callback/google`)
   - [x] Publish app in Google Cloud Console OAuth consent screen (moves out of testing mode)
-  - [x] Paste Client ID + Secret into Neon Auth dashboard → OAuth Providers
+  - [x] Add `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET` as Cloudflare secrets and GitHub Actions secrets
 - [ ] Create Resend account and verify sending domain (update `RESEND_FROM_ADDRESS` from `onboarding@resend.dev` to verified address before production)
-- [x] Enable email verification in Neon Auth dashboard (Auth → Configuration → Email verification)
+- [x] Enable email verification via BetterAuth `emailVerification` plugin + Resend SDK
 - [x] Set up Drizzle ORM + schema migrations
 - [ ] Configure Vercel AI SDK + provider abstraction
 - [ ] Install and configure Tailwind CSS
@@ -34,9 +34,8 @@
 
 ## Phase 2 — Signup Quota Gating
 - [ ] Create `lib/quota.ts` with `QUOTA` constants: `daily` (100) and `monthly` (3000) — update here when upgrading Resend plan
-- [ ] Create `lib/quota-check.ts` with `checkSignupQuota`: queries `neon_auth.users` for counts since `CURRENT_DATE` (daily) and `NOW() - INTERVAL '31 days'` (monthly), returns `{ allowed, reason }`
-- [ ] Create `user.before_create` webhook handler at `app/webhooks/neon-auth/route.ts`: verify Neon Auth webhook signature, call `checkSignupQuota`, return `{ allowed: true/false }` with `error_code` and `error_message`
-- [ ] Register webhook with Neon Auth API, subscribing to `user.before_create` pointing at deployed webhook URL
+- [ ] Create `lib/quota-check.ts` with `checkSignupQuota`: queries BetterAuth `user` table for counts since `CURRENT_DATE` (daily) and `NOW() - INTERVAL '31 days'` (monthly), returns `{ allowed, reason }`
+- [ ] Add BetterAuth `before` hook on user creation in `lib/auth/index.ts`: call `checkSignupQuota`, throw if limit exceeded with `error_code` and `error_message`
 - [ ] Update signup UI to surface quota error codes (`daily_limit`, `monthly_limit`) with user-friendly messaging
 - [ ] Write Phase 2 blog post: quota gating design, webhook approach, and lessons learned
 
