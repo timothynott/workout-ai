@@ -26,7 +26,6 @@ jobs:
     name: Create Neon Branch
     outputs:
       db_url: ${{ steps.create_neon_branch.outputs.db_url }}
-      db_url_with_pooler: ${{ steps.create_neon_branch.outputs.db_url_with_pooler }}
     needs: setup
     if: |
       github.event_name == 'pull_request' && (
@@ -64,7 +63,7 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          DB_URL: ${{ steps.create_neon_branch.outputs.db_url_with_pooler }}
+          DB_URL: ${{ steps.create_neon_branch.outputs.db_url }}
 
   delete_neon_branch:
     name: Delete Neon Branch
