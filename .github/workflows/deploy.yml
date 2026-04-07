@@ -60,17 +60,21 @@ jobs:
             [ -z "$val" ] && return
             echo "$val" | npx wrangler secret put "$key" --name "$WORKER"
           }
-          push_secret AUTH_SECRET         "$AUTH_SECRET"
-          push_secret RESEND_API_KEY      "$RESEND_API_KEY"
-          push_secret RESEND_FROM_ADDRESS "$RESEND_FROM_ADDRESS"
-          push_secret ALLOWED_EMAILS      "$ALLOWED_EMAILS"
+          push_secret AUTH_SECRET          "$AUTH_SECRET"
+          push_secret RESEND_API_KEY       "$RESEND_API_KEY"
+          push_secret RESEND_FROM_ADDRESS  "$RESEND_FROM_ADDRESS"
+          push_secret ALLOWED_EMAILS       "$ALLOWED_EMAILS"
+          push_secret GOOGLE_CLIENT_ID     "$GOOGLE_CLIENT_ID"
+          push_secret GOOGLE_CLIENT_SECRET "$GOOGLE_CLIENT_SECRET"
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_API_TOKEN:  ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          AUTH_SECRET:         ${{ secrets.AUTH_SECRET }}
-          RESEND_API_KEY:      ${{ secrets.RESEND_API_KEY }}
-          RESEND_FROM_ADDRESS: ${{ secrets.RESEND_FROM_ADDRESS }}
-          ALLOWED_EMAILS:      ${{ secrets.ALLOWED_EMAILS }}
+          AUTH_SECRET:           ${{ secrets.AUTH_SECRET }}
+          RESEND_API_KEY:        ${{ secrets.RESEND_API_KEY }}
+          RESEND_FROM_ADDRESS:   ${{ secrets.RESEND_FROM_ADDRESS }}
+          ALLOWED_EMAILS:        ${{ secrets.ALLOWED_EMAILS }}
+          GOOGLE_CLIENT_ID:      ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET:  ${{ secrets.GOOGLE_CLIENT_SECRET }}
 
       - name: Print worker name
         env:

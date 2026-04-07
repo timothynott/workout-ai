@@ -29,6 +29,7 @@
 - [ ] Configure PWA manifest and service worker (next-pwa or similar)
 - [ ] Set up Cloudflare secrets (`ALLOWED_EMAILS`, `ENCRYPTION_KEY`)
 - [ ] Set up public `/blog` route: MDX-based posts, index page, per-post pages
+- [ ] Add `actions/cache` to deploy workflow to cache `.next/cache` between CI runs for faster builds
 - [ ] Write Phase 1 blog post: scaffold decisions, blockers encountered, and how they were resolved
 
 ## Phase 2 — Signup Quota Gating
