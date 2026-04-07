@@ -17,6 +17,9 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.67",
+    "@ai-sdk/google": "^3.0.59",
+    "@ai-sdk/openai": "^3.0.51",
     "@daveyplate/better-auth-ui": "^3.4.0",
     "@hookform/resolvers": "^5.2.2",
     "@neondatabase/serverless": "^1.0.2",
@@ -30,6 +33,7 @@
     "@radix-ui/react-slot": "^1.2.4",
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-tooltip": "^1.2.8",
+    "ai": "^6.0.149",
     "better-auth": "^1.5.6",
     "better-auth-cloudflare": "^0.3.0",
     "class-variance-authority": "^0.7.1",

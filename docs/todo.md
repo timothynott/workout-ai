@@ -20,10 +20,10 @@
   - [x] Register app in Google Cloud Console, create OAuth 2.0 Client ID, add redirect URI (`/api/auth/callback/google`)
   - [x] Publish app in Google Cloud Console OAuth consent screen (moves out of testing mode)
   - [x] Add `GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_SECRET` as Cloudflare secrets and GitHub Actions secrets
-- [ ] Create Resend account and verify sending domain (update `RESEND_FROM_ADDRESS` from `onboarding@resend.dev` to verified address before production)
+- [x] Create Resend account
 - [x] Enable email verification via BetterAuth `emailVerification` plugin + Resend SDK
 - [x] Set up Drizzle ORM + schema migrations
-- [ ] Configure Vercel AI SDK + provider abstraction
+- [x] Configure Vercel AI SDK + provider abstraction
 - [ ] Install and configure Tailwind CSS
 - [ ] Initialize shadcn/ui (`npx shadcn@latest init`)
 - [ ] Configure PWA manifest and service worker (next-pwa or similar)
@@ -90,6 +90,10 @@
 ## Phase 8 — Polish & Deploy
 - [ ] Mobile-first responsive UI pass
 - [ ] PWA install prompt
+- [ ] Move to permanent domain
+  - [ ] Verify sending domain in Resend and update `RESEND_FROM_ADDRESS` secret away from `onboarding@resend.dev`
+  - [ ] Add production domain redirect URIs in Google Cloud Console (`/api/auth/callback/google`)
+  - [ ] Update `workout-ai-staging` and `workout-ai` Worker secrets with new `RESEND_FROM_ADDRESS`
 - [ ] Deploy to Cloudflare Workers (production)
 - [ ] Smoke test on real phone
 - [ ] Write Phase 8 blog post: PWA setup, production deploy experience, and lessons learned
