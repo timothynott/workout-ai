@@ -98,8 +98,8 @@
     "tessl/npm-typescript": {
       "version": "5.9.1"
     },
-    "workout/ddd": {
-      "source": "file:tiles/ddd"
+    "workout/ddd-functional-nextjs": {
+      "version": "0.1.0"
     }
   }
 }
