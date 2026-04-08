@@ -1,6 +1,6 @@
 {
   "name": "workout-ai",
-  "mode": "online",
+  "mode": "managed",
   "dependencies": {
     "cloudflare/skills": {
       "version": "ed57ea9dcb5d520f6ed055d3b1418993ed1ae593",
