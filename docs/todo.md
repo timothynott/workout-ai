@@ -26,6 +26,19 @@
 - [x] Configure Vercel AI SDK + provider abstraction
 - [x] Install and configure Tailwind CSS
 - [x] Initialize shadcn/ui (`npx shadcn@latest init`)
+- [ ] Migrate codebase to DDD structure
+  - [ ] Add `src/shared/domain/` primitives: `Result.ts`, `identity.ts`, `DomainEvent.ts`, `guards.ts`
+  - [ ] Move DB connection: `src/lib/db/index.ts` → `src/shared/infrastructure/db.ts`; update all imports
+  - [ ] Create identity module skeleton: `src/modules/identity/domain/types.ts` (Session, User), `src/modules/identity/index.ts` (public exports)
+  - [ ] Move auth server adapter: `src/lib/auth/index.ts` → `src/modules/identity/infrastructure/adapters/betterAuthAdapter.ts`
+  - [ ] Move auth client adapter: `src/lib/auth/client.ts` → `src/modules/identity/infrastructure/adapters/authClientAdapter.ts`
+  - [ ] Move auth schema: `src/lib/db/auth-schema.ts` → `src/modules/identity/infrastructure/persistence/schema.ts`
+  - [ ] Create composition root: `src/lib/identity.ts`
+  - [ ] Move AI provider: `src/lib/ai/provider.ts` → `src/shared/infrastructure/ai.ts` (to be moved into `modules/workout-generation` in Phase 3)
+  - [ ] Update `drizzle.config.ts` schema path to glob `src/modules/**/infrastructure/persistence/schema.ts`
+  - [ ] Delete `src/lib/db/schema.ts` barrel, `src/lib/auth/`, `src/lib/db/`, `src/lib/ai/` once all imports are updated
+  - [ ] Update all import paths in `src/app/` (route handlers, providers, middleware)
+  - **DDD-exempt (framework-required locations):** `src/middleware.ts`, all `src/app/**` files (Next.js App Router constraint); `drizzle.config.ts` (tooling). These are intentionally outside the module system.
 - [ ] Configure PWA manifest and service worker (next-pwa or similar)
 - [ ] Set up Cloudflare secrets (`ALLOWED_EMAILS`, `ENCRYPTION_KEY`)
 - [ ] Set up public `/blog` route: MDX-based posts, index page, per-post pages
