@@ -1,4 +1,4 @@
-import { auth } from '@/lib/auth';
+import { auth } from '@/lib/identity';
 import { toNextJsHandler } from 'better-auth/next-js';
 
 export const dynamic = 'force-dynamic';

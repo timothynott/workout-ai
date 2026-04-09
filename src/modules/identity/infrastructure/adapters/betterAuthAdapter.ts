@@ -2,11 +2,12 @@ import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { cloudflare } from 'better-auth-cloudflare';
 import { Resend } from 'resend';
-import { db } from '@/lib/db';
+import { db } from '@/shared/infrastructure/db';
+import * as schema from '../persistence/schema';
 
 export const auth = betterAuth({
   secret: process.env.AUTH_SECRET,
-  database: drizzleAdapter(db, { provider: 'pg' }),
+  database: drizzleAdapter(db, { provider: 'pg', schema }),
   plugins: [cloudflare()],
   emailAndPassword: {
     enabled: true,
@@ -30,6 +31,3 @@ export const auth = betterAuth({
     },
   },
 });
-
-export type Session = typeof auth.$Infer.Session;
-export type User = typeof auth.$Infer.Session.user;
