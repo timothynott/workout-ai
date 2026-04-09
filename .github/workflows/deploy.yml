@@ -50,6 +50,9 @@ jobs:
           echo "name=$NAME" >> $GITHUB_OUTPUT
           echo "Deploying as worker: $NAME"
 
+      - name: Test
+        run: pnpm test
+
       - name: Build
         run: pnpm cf:build
         env:

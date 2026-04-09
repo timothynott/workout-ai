@@ -42,8 +42,8 @@
 - [x] Configure PWA manifest and service worker (next-pwa or similar)
 - [x] Set up Cloudflare secrets (`ALLOWED_EMAILS`, `ENCRYPTION_KEY`)
 - [x] Set up public `/blog` route: MDX-based posts, index page, per-post pages
-- [ ] Add `actions/cache` to deploy workflow to cache `.next/cache` between CI runs for faster builds
-- [ ] Add test framework: install Vitest, configure for Next.js + Cloudflare Workers environment, add `pnpm test` script, add test step to GitHub Actions deploy workflow
+- [x] Add `actions/cache` to deploy workflow to cache `.next/cache` between CI runs for faster builds
+- [x] Add test framework: install Vitest, configure for Next.js + Cloudflare Workers environment, add `pnpm test` script, add test step to GitHub Actions deploy workflow
 - [ ] Write Phase 1 blog post: scaffold decisions, blockers encountered, and how they were resolved
 
 ## Phase 2 — Signup Quota Gating
