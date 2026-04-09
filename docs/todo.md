@@ -44,7 +44,13 @@
 - [x] Set up public `/blog` route: MDX-based posts, index page, per-post pages
 - [x] Add `actions/cache` to deploy workflow to cache `.next/cache` between CI runs for faster builds
 - [x] Add test framework: install Vitest, configure for Next.js + Cloudflare Workers environment, add `pnpm test` script, add test step to GitHub Actions deploy workflow
-- [ ] Write Phase 1 blog post: scaffold decisions, blockers encountered, and how they were resolved
+- [ ] Write Phase 1 blog posts
+  - [ ] Project overview (`content/posts/project-overview.mdx`)
+  - [ ] Phase 1 overview (`content/posts/phase-1-scaffold.mdx`)
+  - [ ] Next.js on Cloudflare Workers + OpenNext (`content/posts/cloudflare-workers-opennext.mdx`)
+  - [ ] Why I left Neon Auth for BetterAuth (`content/posts/neon-auth-to-betterauth.mdx`)
+  - [ ] DDD in a Next.js app (`content/posts/ddd-nextjs.mdx`)
+  - [ ] AI without server-side keys (`content/posts/ai-user-supplied-keys.mdx`)
 
 ## Phase 2 — Signup Quota Gating
 - [ ] Create `lib/quota.ts` with `QUOTA` constants: `daily` (100) and `monthly` (3000) — update here when upgrading Resend plan
