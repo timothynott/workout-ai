@@ -24,8 +24,8 @@
 - [x] Enable email verification via BetterAuth `emailVerification` plugin + Resend SDK
 - [x] Set up Drizzle ORM + schema migrations
 - [x] Configure Vercel AI SDK + provider abstraction
-- [ ] Install and configure Tailwind CSS
-- [ ] Initialize shadcn/ui (`npx shadcn@latest init`)
+- [x] Install and configure Tailwind CSS
+- [x] Initialize shadcn/ui (`npx shadcn@latest init`)
 - [ ] Configure PWA manifest and service worker (next-pwa or similar)
 - [ ] Set up Cloudflare secrets (`ALLOWED_EMAILS`, `ENCRYPTION_KEY`)
 - [ ] Set up public `/blog` route: MDX-based posts, index page, per-post pages
