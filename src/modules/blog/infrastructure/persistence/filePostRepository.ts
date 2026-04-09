@@ -20,8 +20,10 @@ export const createFilePostRepository = (): PostRepository => ({
           title: data.title as string,
           date: data.date as string,
           description: data.description as string,
+          draft: data.draft as boolean | undefined,
         };
       })
+      .filter((p) => !p.draft)
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   },
 

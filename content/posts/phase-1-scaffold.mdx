@@ -1,18 +1,32 @@
 ---
 title: "Phase 1: Scaffolding an AI Workout App on Cloudflare Workers"
-date: "2026-04-09"
-description: "How I scaffolded an AI-powered workout app using DDD, Next.js 16, and Cloudflare Workers — decisions made, blockers hit, and how I resolved them."
+date: "2026-04-08"
+description: "Every decision made setting up the scaffold — hosting, auth, database, AI, structure, and tooling."
+draft: true
 ---
 
-*This post is a placeholder. The full write-up will be completed at the end of Phase 1.*
+<!-- ~80 words: Open with what Phase 1 covers — the full scaffold before any real features. Name the constraint that shaped most of the decisions: everything has to run on Cloudflare Workers' edge runtime. -->
 
-## What We're Building
+## Hosting
 
-An AI-powered personal workout app inspired by Freeletics. Single user, no native app — just a mobile-first PWA backed by Next.js 16, Cloudflare Workers, Neon Postgres, and the Vercel AI SDK.
+<!-- ~80 words: Next.js on Cloudflare Workers via OpenNext. Workers over Pages — the recommendation changed. `@cloudflare/next-on-pages` is deprecated. Full App Router support required the Node.js compat layer only Workers provides. Link to the deep dive: [Next.js on Cloudflare Workers](/blog/cloudflare-workers-opennext). -->
 
-## Coming Soon
+## Auth
 
-- Why Cloudflare Workers over Pages
-- Self-hosting BetterAuth after Neon Auth hit an edge-compatibility wall
-- Migrating the codebase to DDD (domain-driven design) with functional TypeScript
-- Setting up the Tessl skill system for AI-assisted development
+<!-- ~80 words: Self-hosted BetterAuth with a Neon Postgres adapter. Started with Neon Auth — hit an edge-incompatible `crypto` dependency in its middleware that OpenNext couldn't work around. Switched to self-hosted. Unexpected bonus: branch-level auth isolation for free. Link to the deep dive: [Why I Left Neon Auth](/blog/neon-auth-to-betterauth). -->
+
+## Database & ORM
+
+<!-- ~80 words: Neon Postgres with Drizzle ORM. Neon was already required for auth. Drizzle over Prisma because Drizzle is edge-native — no binary query engine, no code gen step, small bundle. Neon's branch-per-environment strategy means preview deploys never touch production data. -->
+
+## AI
+
+<!-- ~80 words: Vercel AI SDK as a model-agnostic abstraction over Claude, OpenAI, and Google. Users supply their own API key at onboarding — no server-side AI secrets, costs go to your own account. Key encrypted at rest. Link to the deep dive: [AI Without Server-Side Keys](/blog/ai-user-supplied-keys). -->
+
+## Structure
+
+<!-- ~80 words: DDD module structure under `src/modules/` and `src/shared/`. Overkill for a personal project on paper, but clear boundaries mean you can find anything six months later. `src/app/` and `src/middleware.ts` stay as framework-required exceptions. Link to the deep dive: [Why I'm Using DDD on a Personal Project](/blog/ddd-nextjs). -->
+
+## Tooling
+
+<!-- ~80 words: Tailwind + shadcn/ui for the UI. Tessl for agent context — registry skills keep Claude and Cursor from hallucinating deprecated APIs. Vitest for domain unit tests. GitHub Actions for deploy, preview workers per branch, and automatic cleanup on merge. ENCRYPTION_KEY and all auth secrets in Cloudflare Workers secrets. -->

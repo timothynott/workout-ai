@@ -3,6 +3,7 @@ export interface PostMeta {
   title: string;
   date: string;
   description: string;
+  draft?: boolean;
 }
 
 export interface Post extends PostMeta {
