@@ -13,6 +13,8 @@ export default function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|auth|api/auth).*)',
+    // Protect all routes except: root, blog, auth pages, static assets, and PWA files.
+    // (?!$) excludes the root path "/" itself (empty string after the leading slash).
+    '/((?!_next/static|_next/image|favicon.ico|sw.js|manifest.webmanifest|icons/|blog|auth|api/auth)(?!$).*)',
   ],
 };

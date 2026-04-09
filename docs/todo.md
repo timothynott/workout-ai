@@ -41,7 +41,7 @@
   - **DDD-exempt (framework-required locations):** `src/middleware.ts`, all `src/app/**` files (Next.js App Router constraint); `drizzle.config.ts` (tooling). These are intentionally outside the module system.
 - [x] Configure PWA manifest and service worker (next-pwa or similar)
 - [x] Set up Cloudflare secrets (`ALLOWED_EMAILS`, `ENCRYPTION_KEY`)
-- [ ] Set up public `/blog` route: MDX-based posts, index page, per-post pages
+- [x] Set up public `/blog` route: MDX-based posts, index page, per-post pages
 - [ ] Add `actions/cache` to deploy workflow to cache `.next/cache` between CI runs for faster builds
 - [ ] Add test framework: install Vitest, configure for Next.js + Cloudflare Workers environment, add `pnpm test` script, add test step to GitHub Actions deploy workflow
 - [ ] Write Phase 1 blog post: scaffold decisions, blockers encountered, and how they were resolved
