@@ -64,6 +64,7 @@ jobs:
           push_secret RESEND_API_KEY       "$RESEND_API_KEY"
           push_secret RESEND_FROM_ADDRESS  "$RESEND_FROM_ADDRESS"
           push_secret ALLOWED_EMAILS       "$ALLOWED_EMAILS"
+          push_secret ENCRYPTION_KEY       "$ENCRYPTION_KEY"
           push_secret GOOGLE_CLIENT_ID     "$GOOGLE_CLIENT_ID"
           push_secret GOOGLE_CLIENT_SECRET "$GOOGLE_CLIENT_SECRET"
         env:
@@ -73,6 +74,7 @@ jobs:
           RESEND_API_KEY:        ${{ secrets.RESEND_API_KEY }}
           RESEND_FROM_ADDRESS:   ${{ secrets.RESEND_FROM_ADDRESS }}
           ALLOWED_EMAILS:        ${{ secrets.ALLOWED_EMAILS }}
+          ENCRYPTION_KEY:        ${{ secrets.ENCRYPTION_KEY }}
           GOOGLE_CLIENT_ID:      ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET:  ${{ secrets.GOOGLE_CLIENT_SECRET }}
 

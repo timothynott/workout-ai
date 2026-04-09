@@ -41,7 +41,7 @@ Next.js deployed to **Cloudflare Workers** using [`@opennextjs/cloudflare`](http
 
 [BetterAuth](https://better-auth.com) self-hosted with a Neon Postgres adapter. Originally used Neon Auth (a managed auth service built on BetterAuth), but migrated because Neon Auth's middleware has a Node.js `crypto` dependency that is not edge-compatible, and Neon Auth's `proxy.ts` approach is not supported by `@opennextjs/cloudflare` (issue #962). Self-hosted BetterAuth stores auth tables directly in our Neon DB, so branch-level auth isolation is automatic — no extra configuration needed.
 
-Auth is configured in `lib/auth/index.ts` (server) and `lib/auth/client.ts` (React client). UI components are provided by `@daveyplate/better-auth-ui`. The `middleware.ts` edge runtime checks the BetterAuth session cookie and redirects unauthenticated requests to `/auth/sign-in`.
+Auth is configured in `modules/identity/infrastructure/adapters/betterAuthAdapter.ts` (server) and `modules/identity/infrastructure/adapters/authClientAdapter.ts` (React client), wired via the `lib/identity.ts` composition root. UI components are provided by `@daveyplate/better-auth-ui`. The `middleware.ts` edge runtime checks the BetterAuth session cookie and redirects unauthenticated requests to `/auth/sign-in`.
 
 Signups are restricted to a configurable allowlist of email addresses stored as a Cloudflare secret (`ALLOWED_EMAILS`).
 
@@ -57,7 +57,7 @@ Neon Postgres for all persistent storage. Chosen because Neon Auth already requi
 ## ADR-004: AI Abstraction — Vercel AI SDK with User-Supplied Credentials
 **Status:** Accepted
 
-The [Vercel AI SDK](https://sdk.vercel.ai) provides a model-agnostic interface over Claude, OpenAI, Google, and others. All AI interactions go through a thin provider abstraction in `/lib/ai/provider.ts`.
+The [Vercel AI SDK](https://sdk.vercel.ai) provides a model-agnostic interface over Claude, OpenAI, Google, and others. All AI interactions go through a thin provider abstraction in `shared/infrastructure/ai.ts` (to be moved into `modules/workout-generation` in Phase 3).
 
 Rather than storing AI credentials as server-side environment variables, each user supplies their own provider, model ID, and API key during onboarding. These are stored in the `user_profile` table (API key encrypted at rest — see ADR-012). At request time, the server decrypts the user's key and instantiates the correct Vercel AI SDK provider.
 
@@ -70,7 +70,17 @@ This keeps AI costs attributed to the user's own account and avoids any shared s
 
 Sensitive fields in the database (currently: AI API keys in `user_profile`) are encrypted at rest using AES-256-GCM before being written to Neon. A single app-level encryption key is stored as a Cloudflare secret (`ENCRYPTION_KEY`) and never touches the database.
 
-Encryption and decryption are handled by a thin utility at `/lib/crypto.ts`. All writes to encrypted fields go through this utility — raw plaintext values are never persisted.
+Encryption and decryption are handled by a thin utility at `lib/crypto.ts` (to be implemented in Phase 3). All writes to encrypted fields go through this utility — raw plaintext values are never persisted.
+
+**Key management per environment:**
+
+| Environment | Key source |
+|---|---|
+| Local | `.dev.vars` (gitignored) |
+| Preview workers | GitHub Actions secret `ENCRYPTION_KEY` — shared across all preview branches is acceptable; previews are ephemeral and hold no real user data |
+| Production (`workout-ai`) | Set directly via `wrangler secret put ENCRYPTION_KEY --name workout-ai` — never committed or stored in CI |
+
+Production uses a separate key so that a compromised preview deployment cannot decrypt production data. The separation should be enforced before any real user data is written (Phase 3 onboarding).
 
 ---
 
