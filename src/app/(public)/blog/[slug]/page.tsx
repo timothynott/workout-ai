@@ -1,5 +1,6 @@
 import { getAllPosts, getPost } from '@/lib/blog';
 import { MDXRemote } from 'next-mdx-remote/rsc';
+import remarkGfm from 'remark-gfm';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -41,7 +42,7 @@ export default async function PostPage({
       <time className="text-sm text-muted-foreground">{post.date}</time>
       <h1 className="text-3xl font-bold mt-2 mb-10">{post.title}</h1>
       <article className="prose prose-neutral dark:prose-invert max-w-none">
-        <MDXRemote source={post.content} />
+        <MDXRemote source={post.content} options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }} />
       </article>
     </main>
   );
