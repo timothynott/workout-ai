@@ -1,0 +1,24 @@
+---
+title: "Why I'm Using DDD on a Personal Project"
+date: "2026-04-08"
+description: "Domain-driven design for a one-user workout app sounds like overkill. Here's why I did it anyway and what it actually looks like in a Next.js codebase."
+draft: true
+---
+
+<!-- ~80 words: Hook. Acknowledge upfront that DDD on a personal project sounds like over-engineering. Then make the case in one sentence for why you did it anyway — future-you, returning to this codebase in six months, will know exactly where everything lives. -->
+
+## The Folder Structure
+
+<!-- ~180 words: Walk through `src/modules/[context]/domain`, `application`, `infrastructure`, and `index.ts`. Explain what lives where with a concrete example from the codebase — the blog or identity module. Keep it practical, not theoretical. -->
+
+## The Rule That Pays Off
+
+<!-- ~150 words: The one rule that matters most: nothing outside a module imports from anywhere except that module's `index.ts`. What this gives you — you can refactor internals without touching anything else, and the public API is explicit. Give a concrete before/after or example. -->
+
+## What's Exempt
+
+<!-- ~100 words: `src/app/**`, `src/middleware.ts`, and `drizzle.config.ts` are framework-required locations — Next.js App Router and tooling constraints mean they can't live in the module system. How you handle the boundary: composition roots in `src/lib/` wire the modules to the framework. -->
+
+## Would I Do It Again
+
+<!-- ~130 words: Honest take. The upfront cost — scaffolding the layers for even a simple module takes more files than you'd write otherwise. What you get in return: clarity, testability, and a codebase that doesn't turn into a ball of mud. Your verdict for a project of this size. -->

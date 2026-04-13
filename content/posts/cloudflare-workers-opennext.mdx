@@ -1,0 +1,24 @@
+---
+title: "Next.js on Cloudflare Workers: Why Pages Is the Wrong Choice Now"
+date: "2026-04-08"
+description: "Cloudflare Pages used to be the obvious target for Next.js. It isn't anymore — here's what changed and how OpenNext fills the gap."
+draft: true
+---
+
+<!-- ~80 words: Open with the assumption you started with — Pages felt like the obvious choice for a Next.js deploy. Set up the pivot: you dug into the docs and found the recommendation had changed. -->
+
+## Why Pages Falls Short
+
+<!-- ~150 words: Pages only supports the Edge runtime, which means no Server Actions, limited middleware, no Image Optimization, and incomplete App Router support. The `@cloudflare/next-on-pages` adapter that powered it is now deprecated. Be specific about what you'd lose. -->
+
+## Workers Is the New Target
+
+<!-- ~150 words: Cloudflare now recommends Workers for Next.js because Workers has the Node.js compatibility layer that Pages lacks. The full App Router works. What that looks like in practice — wrangler.jsonc, the worker entry point, how routing works. -->
+
+## OpenNext
+
+<!-- ~180 words: `@opennextjs/cloudflare` is the adapter that makes this work. Explain what it does — wraps the Next.js build output, adapts it for the Workers runtime. Why OpenNext over the alternatives. Mention the native adapter API that landed in Next.js 16.2 (March 2026) and what that means for the future. -->
+
+## The Build Process
+
+<!-- ~100 words: `pnpm cf:build` runs `opennextjs-cloudflare build`, then `wrangler deploy` ships it. One gotcha you hit or something that surprised you about the process. -->

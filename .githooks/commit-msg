@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Enforces Conventional Commits format:
+# <type>(<scope>)!: <summary>
+# Types: feat, fix, docs, chore, refactor, test, ci, style, perf
+
+commit_msg=$(cat "$1")
+pattern='^(feat|fix|docs|chore|refactor|test|ci|style|perf)(\(.+\))?(!)?: .{1,72}$'
+
+# Allow merge commits and fixups
+if echo "$commit_msg" | grep -qE '^(Merge|Revert|fixup!|squash!)'; then
+  exit 0
+fi
+
+if ! echo "$commit_msg" | grep -qE "$pattern"; then
+  echo ""
+  echo "  ERROR: Commit message does not follow Conventional Commits."
+  echo ""
+  echo "  Format:  <type>(<scope>): <summary>"
+  echo "  Example: feat(auth): add email allowlist check"
+  echo ""
+  echo "  Types: feat, fix, docs, chore, refactor, test, ci, style, perf"
+  echo "  - scope is optional"
+  echo "  - summary must be ≤72 chars, lowercase, no trailing period"
+  echo "  - append ! after type/scope for breaking changes"
+  echo ""
+  echo "  Got: $commit_msg"
+  echo ""
+  exit 1
+fi

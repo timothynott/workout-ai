@@ -1,0 +1,24 @@
+---
+title: "Why I Left Neon Auth for Self-Hosted BetterAuth"
+date: "2026-04-08"
+description: "Neon Auth looked like a perfect fit until edge-incompatible middleware broke everything. Here's what happened and how self-hosted BetterAuth fixed it."
+draft: true
+---
+
+<!-- ~100 words: Open with the moment the problem appeared — what you were trying to do, what broke, and your first reaction. No background yet, just the hook. -->
+
+## What Neon Auth Promised
+
+<!-- ~100 words: Why it seemed like the obvious choice: managed auth, already on Neon, built on BetterAuth under the hood. You'd get auth without wiring anything yourself. Set up the expectation that was about to break. -->
+
+## The Wall
+
+<!-- ~180 words: The specific blocker — Node.js `crypto` dependency in Neon Auth's middleware, not compatible with the Cloudflare Workers edge runtime. The OpenNext issue (#962) that confirmed the `proxy.ts` approach wasn't supported. Describe the debugging process: what you tried, where you looked, when you knew it wasn't fixable without leaving Neon Auth. -->
+
+## The Fix
+
+<!-- ~150 words: What switching to self-hosted BetterAuth looked like in practice. What you had to wire up yourself — the Neon adapter, the auth tables, the middleware. How long it actually took once you knew what you were doing. -->
+
+## The Unexpected Bonus
+
+<!-- ~100 words: Branch-level auth isolation for free. Because BetterAuth tables live in the same Neon DB, every Neon preview branch gets its own isolated auth users automatically — no extra config. You wouldn't have had this with Neon Auth's managed service. -->

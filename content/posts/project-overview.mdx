@@ -1,0 +1,43 @@
+---
+title: "I'm Building an AI Workout App from Scratch"
+date: "2026-04-08"
+description: "What I'm building, why I'm not just using Freeletics, and the stack I chose."
+draft: false
+---
+
+## Why am I doing this?
+
+Now, more than ever, anyone who says, "I can build something better," had better put their money where their mouth is. But, that's not my motivation. 
+True, the first AI-powered workout app I used had a limitation that frustrated me, but the real reason for this endeavor is more about trying out 
+tech than filling a void in the app stores.
+
+### CloudFlare hosting
+
+The top of my list to explore is hosting on CloudFlare. I have played around with CF workers a bit in the past, but I have yet to build a full app. 
+We use NextJS at work, so I was particularly interested to see if I could get that running well in this environment. I have implemented OpenNext
+to get the job done. Looking forward to a CloudFlare implementation of the new NextJS adapter API, but OpenNext will suffice in the mean time.
+
+### ~~NeonAuth~~ BetterAuth
+
+I have played with Neon databases, as well, and I think the idea of Neon Auth is fantastic. And, it probably is. With Neon databases, you get db
+branching, which is amazing for development. Add that to not having to roll my own auth also seems like a big win. But, on CF Workers, it's a world 
+of workarounds. Neon Auth wants to use proxy.ts. Proxy.ts does not play nicely with OpenNext and CF Workers since it requires a Node runtime.
+
+Between that and the fact that Neon Auth is a paid wrapper of BetterAuth, I thought I would just go to the source. I still get db branching since I'm
+using Neon.
+
+### Neon
+
+Said what I need to say about that. DB branching is awesome.
+
+### Tessl
+
+I have been getting whiplash trying to keep track of what I am and am not supposed to do in terms of putting up guardrails for AI. Tessl promises to 
+fix that, so I'm giving it a try. So far, I'm happy with the results. I built a couple of Tessl tiles and used the feedback from Tessl's optimization 
+algo to dial them in to reduce context expense.
+
+## What It Does
+
+This is pretty simple. The goal of the app is to start with an interview of the user to see understand goals, like/dislikes, no-go exercises, available 
+equipment, etc. From there, it makes a daily plan for the user. The user gives feedback on how a given day has gone. Future workouts take the feedback 
+into consideration for future planning.

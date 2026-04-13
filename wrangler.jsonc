@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "workout-ai",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-03-31",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  // Secrets (set via `wrangler secret put` or deploy workflow):
+  //   DATABASE_URL          — Neon Postgres connection string (set manually for workout-ai and workout-ai-staging)
+  //   AUTH_SECRET           — Random 32+ char secret (openssl rand -base64 32)
+  //   GOOGLE_CLIENT_ID      — Google OAuth client ID (staging + production only)
+  //   GOOGLE_CLIENT_SECRET  — Google OAuth client secret (staging + production only)
+  //   RESEND_API_KEY        — Resend API key for email verification
+  //   RESEND_FROM_ADDRESS   — Verified sending address (onboarding@resend.dev for dev/test)
+  //   ALLOWED_EMAILS        — Comma-separated list of authorised email addresses
+}

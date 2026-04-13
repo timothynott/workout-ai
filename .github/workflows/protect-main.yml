@@ -1,0 +1,22 @@
+name: Protect main branch
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check-source-branch:
+    name: Verify source branch is allowed
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check source branch
+        run: |
+          SOURCE="${{ github.head_ref }}"
+          if [[ "$SOURCE" == "staging" || "$SOURCE" == hotfix-* ]]; then
+            echo "Source branch '$SOURCE' is allowed to merge into main."
+          else
+            echo "ERROR: '$SOURCE' may not merge directly into main."
+            echo "Only 'staging' or 'hotfix-*' branches are allowed."
+            exit 1
+          fi
