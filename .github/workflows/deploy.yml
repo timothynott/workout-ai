@@ -79,6 +79,13 @@ jobs:
           push_secret ENCRYPTION_KEY       "$ENCRYPTION_KEY"
           push_secret GOOGLE_CLIENT_ID     "$GOOGLE_CLIENT_ID"
           push_secret GOOGLE_CLIENT_SECRET "$GOOGLE_CLIENT_SECRET"
+          # Preview branches get DATABASE_URL from neon_branches.yml (per-PR Neon branch).
+          # Only push it here for main/staging where a stable connection string is needed.
+          if [ "$GITHUB_REF_NAME" = "main" ]; then
+            push_secret DATABASE_URL "$DATABASE_URL"
+          elif [ "$GITHUB_REF_NAME" = "staging" ]; then
+            push_secret DATABASE_URL "$DATABASE_URL_STAGING"
+          fi
         env:
           CLOUDFLARE_API_TOKEN:  ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -89,6 +96,8 @@ jobs:
           ENCRYPTION_KEY:        ${{ secrets.ENCRYPTION_KEY }}
           GOOGLE_CLIENT_ID:      ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET:  ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          DATABASE_URL:          ${{ secrets.DATABASE_URL }}
+          DATABASE_URL_STAGING:  ${{ secrets.DATABASE_URL_STAGING }}
 
       - name: Print worker name
         env:
