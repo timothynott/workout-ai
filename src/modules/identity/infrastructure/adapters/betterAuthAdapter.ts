@@ -12,6 +12,14 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
+    async sendResetPassword({ user, url }) {
+      await new Resend(process.env.RESEND_API_KEY).emails.send({
+        from: process.env.RESEND_FROM_ADDRESS ?? 'onboarding@resend.dev',
+        to: user.email,
+        subject: 'Reset your password',
+        html: `<p>Click <a href="${url}">here</a> to reset your password. This link expires in 1 hour.</p>`,
+      });
+    },
   },
   emailVerification: {
     sendOnSignUp: true,
