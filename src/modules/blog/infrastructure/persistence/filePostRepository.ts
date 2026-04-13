@@ -1,3 +1,9 @@
+// Used in local dev (next dev) where the real Node.js filesystem is available.
+// MDX files are read directly on each request, so edits show on browser refresh
+// without needing a server restart.
+//
+// NOT used in Cloudflare Worker builds — the Workers runtime has no real filesystem.
+// See manifestPostRepository.ts for the CF build implementation.
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
