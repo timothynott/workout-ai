@@ -1,16 +1,35 @@
 // Used in local dev (next dev) where the real Node.js filesystem is available.
-// MDX files are read directly on each request, so edits show on browser refresh
-// without needing a server restart.
+// MDX files are read and compiled to HTML on each request, so edits show on
+// browser refresh without needing a server restart.
 //
 // NOT used in Cloudflare Worker builds — the Workers runtime has no real filesystem.
-// See manifestPostRepository.ts for the CF build implementation.
+// See manifestPostRepository.ts for the CF build implementation, which uses
+// HTML pre-compiled at build time by scripts/generate-posts-manifest.mjs.
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
+import { unified } from 'unified';
+import remarkParse from 'remark-parse';
+import remarkGfm from 'remark-gfm';
+import remarkRehype from 'remark-rehype';
+import rehypeStringify from 'rehype-stringify';
 import type { Post, PostMeta } from '../../domain/types';
 import type { PostRepository } from '../../domain/repositories/postRepository';
 
 const POSTS_DIR = path.join(process.cwd(), 'content/posts');
+
+// Compile Markdown/MDX to HTML synchronously. MDX-specific JSX syntax is not
+// supported — write posts in standard Markdown (+ GFM tables, task lists, etc.).
+function compileMdx(content: string): string {
+  return String(
+    unified()
+      .use(remarkParse)
+      .use(remarkGfm)
+      .use(remarkRehype)
+      .use(rehypeStringify)
+      .processSync(content),
+  );
+}
 
 export const createFilePostRepository = (): PostRepository => ({
   findAll(): PostMeta[] {
@@ -43,7 +62,7 @@ export const createFilePostRepository = (): PostRepository => ({
       title: data.title as string,
       date: data.date as string,
       description: data.description as string,
-      content,
+      content: compileMdx(content),
     };
   },
 });

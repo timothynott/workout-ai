@@ -1,6 +1,4 @@
 import { getAllPosts, getPost } from '@/lib/blog';
-import { MDXRemote } from 'next-mdx-remote/rsc';
-import remarkGfm from 'remark-gfm';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -41,9 +39,13 @@ export default async function PostPage({
       </Link>
       <time className="text-sm text-muted-foreground">{post.date}</time>
       <h1 className="text-3xl font-bold mt-2 mb-10">{post.title}</h1>
-      <article className="prose prose-neutral dark:prose-invert max-w-none">
-        <MDXRemote source={post.content} options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }} />
-      </article>
+      {/* Post content is pre-compiled to HTML — by filePostRepository in dev
+          and by scripts/generate-posts-manifest.mjs in CF builds. Both use the
+          same remark → rehype pipeline so output is identical in both envs. */}
+      <article
+        className="prose prose-neutral dark:prose-invert max-w-none"
+        dangerouslySetInnerHTML={{ __html: post.content }}
+      />
     </main>
   );
 }
