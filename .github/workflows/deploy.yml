@@ -58,6 +58,15 @@ jobs:
         env:
           AUTH_SECRET: build-time-placeholder
 
+      - name: Migrate database
+        # Run migrations before deploying the Worker so the schema is updated
+        # before the new code goes live. Only runs for main and staging — preview
+        # branches get their schema via `db:push` in neon_branches.yml instead.
+        if: github.ref_name == 'main' || github.ref_name == 'staging'
+        run: pnpm db:migrate
+        env:
+          DATABASE_URL: ${{ github.ref_name == 'main' && secrets.DATABASE_URL || secrets.DATABASE_URL_STAGING }}
+
       - name: Deploy
         run: npx wrangler deploy --name ${{ steps.worker.outputs.name }}
         env:
