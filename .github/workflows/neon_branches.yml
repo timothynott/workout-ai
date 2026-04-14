@@ -69,8 +69,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Push schema to Neon preview branch
-        run: pnpm db:push
+      - name: Migrate Neon preview branch
+        # Preview branches are forked from production, which already has the baseline
+        # schema. db:migrate applies only the delta introduced by this PR — safer than
+        # db:push, which could silently alter or drop columns that exist in production.
+        run: pnpm db:migrate
         env:
           DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
 

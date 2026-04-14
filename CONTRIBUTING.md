@@ -11,7 +11,37 @@ git add drizzle/
 
 The deploy workflow runs `pnpm db:migrate` automatically when a PR merges to `main` or `staging`. If you don't commit the migration file, the schema change will never reach those environments.
 
-**Never use `pnpm db:push` for staging or production.** `db:push` is only used for preview branches (handled automatically by `.github/workflows/neon_branches.yml`) — it bypasses the migration history.
+**Never use `pnpm db:push`.** All environments (local, preview, staging, production) use `db:migrate`. Always generate a migration file and apply it.
+
+### Bootstrapping an existing database
+
+If your local Neon branch already has tables (created via `db:push` before migrations were introduced) but no migration history, `db:migrate` will fail with `relation already exists`. Fix it by recording the baseline migration as already applied:
+
+```bash
+# Get your connection string (non-pooled)
+neonctl connection-string dev/yourname --project-id <project-id>
+
+# Mark the baseline migration as applied
+node -e "
+const { Pool } = require('pg');
+const { readMigrationFiles } = require('drizzle-orm/migrator');
+const pool = new Pool({ connectionString: '<your-non-pooled-url>?sslmode=verify-full' });
+async function run() {
+  const client = await pool.connect();
+  const [baseline] = readMigrationFiles({ migrationsFolder: './drizzle' });
+  await client.query('CREATE SCHEMA IF NOT EXISTS drizzle');
+  await client.query('CREATE TABLE IF NOT EXISTS drizzle.__drizzle_migrations (id SERIAL PRIMARY KEY, hash text NOT NULL, created_at bigint)');
+  await client.query('INSERT INTO drizzle.__drizzle_migrations (hash, created_at) VALUES (\$1, \$2)', [baseline.hash, baseline.folderMillis]);
+  console.log('done'); client.release(); pool.end();
+}
+run().catch(console.error);
+"
+
+# Now migrate as normal
+pnpm db:migrate
+```
+
+This is a one-time step for branches created before the migration baseline was introduced.
 
 ## Branch → Environment Mapping
 
