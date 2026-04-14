@@ -1,0 +1,20 @@
+---
+title: "AI Without Server-Side Keys"
+date: "2026-04-08"
+description: "Instead of storing AI API keys as server secrets, users supply their own at onboarding. Here's why and how."
+draft: true
+---
+
+<!-- ~80 words: Hook. Open with the standard setup everyone uses — server holds an API key, all users share it. Then name the problem that makes it the wrong fit here: this is a personal app where you want to choose your own model and not pay through a server you host. -->
+
+## The Problem With Shared Keys
+
+<!-- ~150 words: Three reasons the standard approach breaks down for this project: you'd be paying for AI twice (once for the server key, once indirectly via hosting costs), you can't easily swap models, and you're storing a secret that only benefits one user. Be specific and honest about whether these trade-offs matter at scale vs. for a personal tool. -->
+
+## The Approach
+
+<!-- ~200 words: Users supply their own provider, model ID, and API key during onboarding. The key is encrypted at rest using AES-256-GCM before it hits the database — `ENCRYPTION_KEY` lives as a Cloudflare secret, never in the DB. At request time, the server decrypts and instantiates the right Vercel AI SDK provider. The Vercel AI SDK makes swapping providers a one-line change. -->
+
+## The Trade-Off
+
+<!-- ~150 words: What you give up: every user needs their own API key, which adds friction at onboarding. For a single-user personal app this is a non-issue — but name it anyway. What you get: AI costs go to your own account, you can swap models without a redeploy, and there's no shared server-side secret to rotate if something leaks. -->

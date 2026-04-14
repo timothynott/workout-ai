@@ -12,7 +12,7 @@ An AI-powered workout app inspired by Freeletics. Generates personalized workout
 
 ### Prerequisites
 - [Neon](https://neon.tech) account
-- [Cloudflare](https://cloudflare.com) account with Pages enabled
+- [Cloudflare](https://cloudflare.com) account with Workers enabled
 - [Tessl](https://tessl.io) account (free) for agent skill management
 - GitHub repository (required for Neon branch automation)
 
@@ -36,67 +36,185 @@ npx tessl install github:vercel/ai --skill ai-sdk --yes
 npx tessl install github:shadcn-ui/ui --skill shadcn --yes
 ```
 
-**GitHub Actions:** Add a `TESSL_TOKEN` secret to the repository (obtained via `npx tessl auth token`) and include the following step in CI workflows so agents running in CI have the same skill context:
-
-```yaml
-- name: Install Tessl skills
-  run: npx tessl install --yes
-  env:
-    TESSL_TOKEN: ${{ secrets.TESSL_TOKEN }}
-```
+Tessl skills are for local AI coding tools only — they are not needed in CI.
 
 ### 2. Neon Setup
 
-1. Create a new Neon project at [console.neon.tech](https://console.neon.tech).
-2. The default branch (`main`) is your production database.
-3. Note the connection string — this becomes `DATABASE_URL` in production.
+#### Create the project
 
-**Local development branch:**
+1. Go to [console.neon.tech](https://console.neon.tech) and click **New project**.
+2. Name it (e.g. `workout-ai`). Leave the default Postgres version and region as-is unless you have a preference.
+3. The project is created with a default branch named `main` — this is your **production database**. Do not rename it.
+4. Once created, open the project and go to **Dashboard → Connection string**. Copy the pooled connection string (it looks like `postgresql://user:pass@ep-xxx.region.aws.neon.tech/neondb?sslmode=require`). This is your production `DATABASE_URL`.
+
+#### Store the production DATABASE_URL
+
+Add it as a GitHub Actions secret so the CI/CD deploy workflow can set it on the production Worker:
+
 ```bash
-neonctl branch create --name dev/yourname
-neonctl connection-string dev/yourname
-```
-Add the output as `DATABASE_URL` in `.env.local`.
-
-**Preview branch automation:**
-
-Install the [Neon GitHub integration](https://neon.com/docs/guides/neon-github-integration) on your repository. This automatically creates a Neon branch for each git branch and exposes `DATABASE_URL` as a GitHub Actions secret per branch.
-
-Add the following GitHub Actions step to your preview deployment workflow to forward the branch-specific `DATABASE_URL` to the Cloudflare Pages preview environment:
-
-```yaml
-- name: Set Neon branch DATABASE_URL on Cloudflare Pages preview
-  run: |
-    curl -X PATCH \
-      "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/pages/projects/${{ secrets.CLOUDFLARE_PROJECT_NAME }}/deployments/${{ steps.deploy.outputs.deployment-id }}/env" \
-      -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
-      -H "Content-Type: application/json" \
-      --data '{"DATABASE_URL": "${{ env.DATABASE_URL }}"}'
+echo "<connection-string>" | gh secret set DATABASE_URL --repo <owner>/<repo>
 ```
 
-### 3. Neon Auth Setup
+Also note the **Project ID** (visible in the URL: `console.neon.tech/app/projects/<project-id>` or under project settings) — you'll need it for the GitHub integration in a later step.
 
-1. In the Neon console, enable **Auth** for your project.
-2. Note the Auth URL and API keys.
-3. Add the following to your Cloudflare Pages environment variables (production and preview):
-   - `NEON_AUTH_URL`
-   - `NEON_AUTH_SECRET`
+#### Create a local dev branch
 
-### 4. Cloudflare Pages Setup
+Each developer gets their own Neon branch so local work never touches production data.
 
-1. Connect your GitHub repository to Cloudflare Pages.
-2. Set the build command: `npm run build` (OpenNext handles the Cloudflare adapter).
-3. Set the output directory as required by OpenNext.
-4. Add the following **production** environment variables in the Cloudflare dashboard:
-   - `DATABASE_URL` — Neon `main` branch connection string
-   - `NEON_AUTH_URL`
-   - `NEON_AUTH_SECRET`
-   - `AI_PROVIDER` — e.g. `anthropic`
-   - `AI_MODEL` — e.g. `claude-sonnet-4-6`
-   - `AI_API_KEY` — API key for the chosen provider
-   - `ALLOWED_EMAILS` — comma-separated list of permitted signup emails
+Install the Neon CLI if you don't have it:
+```bash
+npm install -g neonctl
+neonctl auth
+```
 
-### 5. Local Development
+Create your branch (replace `yourname`):
+```bash
+neonctl branch create --name dev/yourname --project-id <project-id>
+neonctl connection-string dev/yourname --project-id <project-id> --pooled
+```
+
+Copy the output connection string into `.env.local` as `DATABASE_URL` (see [Local Development](#6-local-development) below).
+
+#### Configure the Neon GitHub integration
+
+The Neon GitHub integration automatically creates a Neon branch for each git branch and tears it down when the branch is deleted.
+
+1. Go to your Neon project → **Settings → Integrations → GitHub**.
+2. Click **Install** and authorise Neon to access your GitHub account.
+3. Select the repository (`workout-ai` or whatever you named it) and click **Connect**.
+
+Once installed, Neon will create a `preview/<branch-name>` database branch every time a new git branch is pushed. The deploy workflow already handles wiring the matching `DATABASE_URL` to the preview Worker via `neondatabase/create-branch-action` — no extra workflow changes needed.
+
+### 3. BetterAuth Setup
+
+BetterAuth is self-hosted and configured in code — no external dashboard needed.
+
+1. Generate an `AUTH_SECRET`:
+   ```bash
+   openssl rand -base64 32
+   ```
+2. Run the BetterAuth DB migration to create auth tables in your Neon DB:
+   ```bash
+   pnpm db:push
+   ```
+   This creates the `user`, `session`, `account`, and `verification` tables in Neon using the schema generated by `@better-auth/cli`.
+
+3. Add `AUTH_SECRET` as a GitHub Actions secret and a Cloudflare Worker secret (see steps 5–6):
+   ```bash
+   gh secret set AUTH_SECRET --app actions
+   wrangler secret put AUTH_SECRET --name workout-ai
+   ```
+
+#### Google OAuth
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/) → **APIs & Services → Credentials**.
+2. Create an **OAuth 2.0 Client ID** (Web application).
+3. Add the authorised redirect URIs:
+   ```
+   https://workout-ai-staging.<subdomain>.workers.dev/api/auth/callback/google
+   https://<custom-domain>/api/auth/callback/google
+   ```
+4. Copy the **Client ID** and **Client Secret**.
+5. Add them as GitHub Actions secrets and Cloudflare Worker secrets (see steps 5–6):
+   ```bash
+   gh secret set GOOGLE_CLIENT_ID     --app actions
+   gh secret set GOOGLE_CLIENT_SECRET --app actions
+   wrangler secret put GOOGLE_CLIENT_ID     --name workout-ai
+   wrangler secret put GOOGLE_CLIENT_SECRET --name workout-ai
+   ```
+
+> **OAuth and preview branches:** Only register redirect URIs for stable, long-lived workers (staging, production). Preview branch workers get a new URL per branch — avoid registering them in GCP.
+
+### 4. Resend Setup
+
+Resend delivers auth emails (signup verification). It is integrated via the BetterAuth `emailVerification` plugin in `lib/auth/index.ts` using Resend's Node SDK — no SMTP configuration needed.
+
+1. Create an account at [resend.com](https://resend.com).
+2. Create an API key under **API Keys**. The default `onboarding@resend.dev` sender works for testing.
+3. Before going to production, add and verify your sending domain under **Domains** and update `RESEND_FROM_ADDRESS`.
+4. Add both as GitHub Actions secrets and Cloudflare Worker secrets (see steps 5–6):
+   ```bash
+   gh secret set RESEND_API_KEY      --app actions
+   gh secret set RESEND_FROM_ADDRESS --app actions   # onboarding@resend.dev for testing
+   wrangler secret put RESEND_API_KEY      --name workout-ai
+   wrangler secret put RESEND_FROM_ADDRESS --name workout-ai
+   ```
+
+> Resend's free tier supports 3,000 emails/month and 100/day — sufficient for a personal app.
+
+### 5. Cloudflare Workers Setup
+
+This app deploys to **Cloudflare Workers** (not Pages) using `@opennextjs/cloudflare`.
+
+> **Note:** `@cloudflare/next-on-pages` is deprecated — do not use it. Workers provides the Node.js compatibility layer required for full Next.js App Router support.
+
+1. Install Wrangler and authenticate:
+   ```bash
+   npm install -g wrangler
+   wrangler login
+   ```
+2. `wrangler.jsonc` and `open-next.config.ts` are already committed to the repo.
+3. Set production secrets on stable workers via Wrangler (the deploy workflow keeps them in sync after this):
+   ```bash
+   wrangler secret put DATABASE_URL          --name workout-ai
+   wrangler secret put AUTH_SECRET           --name workout-ai
+   wrangler secret put RESEND_API_KEY        --name workout-ai
+   wrangler secret put RESEND_FROM_ADDRESS   --name workout-ai
+   wrangler secret put GOOGLE_CLIENT_ID      --name workout-ai
+   wrangler secret put GOOGLE_CLIENT_SECRET  --name workout-ai
+   wrangler secret put ALLOWED_EMAILS        --name workout-ai
+   wrangler secret put ENCRYPTION_KEY        --name workout-ai   # openssl rand -base64 32
+   ```
+   > AI provider credentials (API key, provider, model) are supplied by the user during onboarding and stored encrypted in the database — no server-side AI secrets needed.
+4. Deploy:
+   ```bash
+   npm run cf:deploy
+   ```
+6. To preview locally using the Workers runtime:
+   ```bash
+   npm run cf:preview
+   ```
+
+### 6. GitHub Actions CI/CD
+
+The deploy workflow at [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) automatically builds and deploys to Cloudflare Workers on every push to any branch.
+
+**Branch deploy behaviour:**
+
+| Branch | Worker name | URL |
+|---|---|---|
+| `main` | `workout-ai` | `workout-ai.<subdomain>.workers.dev` |
+| any other | `workout-ai-<sanitized-branch-name>` | `workout-ai-<branch>.<subdomain>.workers.dev` |
+
+Branch names are lowercased and non-alphanumeric characters replaced with `-`. Worker names are capped at 63 characters. Find the deployed URL for any worker in the [Cloudflare Workers dashboard](https://dash.cloudflare.com).
+
+**Preview worker cleanup:**
+
+The cleanup workflow at [`.github/workflows/cleanup.yml`](.github/workflows/cleanup.yml) automatically deletes the preview worker when a branch is deleted. To have branches deleted automatically after merge, enable **"Automatically delete head branches"** in your GitHub repository settings (`Settings → General → Pull Requests`).
+
+**Required GitHub repository secrets:**
+
+| Secret | How to get it |
+|---|---|
+| `CLOUDFLARE_API_TOKEN` | Cloudflare dashboard → My Profile → API Tokens → **"Edit Cloudflare Workers"** template |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare dashboard URL or Workers & Pages sidebar |
+| `DATABASE_URL` | Neon console → production `main` branch connection string (pooled) |
+| `AUTH_SECRET` | `openssl rand -base64 32` |
+| `RESEND_API_KEY` | resend.com → API Keys |
+| `RESEND_FROM_ADDRESS` | Your verified sending address (or `onboarding@resend.dev` for testing) |
+| `GOOGLE_CLIENT_ID` | Google Cloud Console → APIs & Services → Credentials |
+| `GOOGLE_CLIENT_SECRET` | Google Cloud Console → APIs & Services → Credentials |
+| `ALLOWED_EMAILS` | Comma-separated list of emails allowed to sign up |
+
+Add secrets via the GitHub CLI:
+```bash
+echo "<token>" | gh secret set CLOUDFLARE_API_TOKEN --repo <owner>/<repo>
+echo "<account-id>" | gh secret set CLOUDFLARE_ACCOUNT_ID --repo <owner>/<repo>
+```
+
+Or add them manually at: `https://github.com/<owner>/<repo>/settings/secrets/actions`
+
+### 7. Local Development
 
 Copy `.env.example` to `.env.local` and fill in values:
 
@@ -105,18 +223,29 @@ cp .env.example .env.local
 ```
 
 ```env
-DATABASE_URL=           # your dev/yourname Neon branch connection string
-NEON_AUTH_URL=
-NEON_AUTH_SECRET=
-AI_PROVIDER=anthropic
-AI_MODEL=claude-sonnet-4-6
-AI_API_KEY=
-ALLOWED_EMAILS=you@example.com
+DATABASE_URL=              # your dev/yourname Neon branch connection string (pooled)
+AUTH_SECRET=               # openssl rand -base64 32
+GOOGLE_CLIENT_ID=          # from Google Cloud Console
+GOOGLE_CLIENT_SECRET=      # from Google Cloud Console
+RESEND_API_KEY=            # from resend.com → API Keys
+RESEND_FROM_ADDRESS=       # onboarding@resend.dev for local testing
+ALLOWED_EMAILS=            # comma-separated list of allowed emails
 ```
+
+> AI provider credentials are entered by the user in the onboarding UI and stored encrypted in the database using `ENCRYPTION_KEY`.
 
 Then:
 ```bash
-npm install
-npm run db:migrate
-npm run dev
+pnpm install
+git config core.hooksPath .githooks   # one-time: enable commit message linting
+pnpm dev
 ```
+
+**Drizzle commands** (used as tables are added in Phase 2+):
+
+| Command | What it does |
+|---|---|
+| `pnpm db:generate` | Generate SQL migration files from schema changes |
+| `pnpm db:migrate` | Apply pending migrations to the database |
+| `pnpm db:push` | Prototype mode: push schema directly (no migration files) |
+| `pnpm db:studio` | Open Drizzle Studio GUI |

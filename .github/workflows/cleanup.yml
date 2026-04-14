@@ -1,0 +1,38 @@
+name: Cleanup
+
+on:
+  delete:
+
+jobs:
+  cleanup:
+    name: Delete preview Worker
+    if: github.event.ref_type == 'branch' && github.event.ref != 'main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Derive worker name
+        id: worker
+        env:
+          BRANCH: ${{ github.event.ref }}
+        run: |
+          SANITIZED=$(echo "$BRANCH" \
+            | tr '[:upper:]' '[:lower:]' \
+            | sed 's/[^a-z0-9]/-/g' \
+            | sed 's/-\+/-/g' \
+            | sed 's/^-//;s/-$//')
+          NAME="workout-ai-${SANITIZED}"
+          NAME="${NAME:0:63}"
+          echo "name=$NAME" >> $GITHUB_OUTPUT
+          echo "Deleting worker: $NAME"
+
+      - name: Delete preview Worker
+        env:
+          WORKER_NAME: ${{ steps.worker.outputs.name }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx wrangler delete --name $WORKER_NAME --force
