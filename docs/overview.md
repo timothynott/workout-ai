@@ -111,7 +111,7 @@ Neon: dev/[your-name]           ← manually created for local development
 **How it works:**
 - `.github/workflows/neon_branches.yml` creates a Neon branch per PR, runs `drizzle-kit push` to apply the current schema, and sets `DATABASE_URL` on the matching preview Worker.
 - The branch is deleted automatically when the PR is closed.
-- Locally, each developer creates their own branch (`neon branch create --name dev/yourname`) and sets `DATABASE_URL` in `.env.local`.
+- Locally, each developer creates their own branch (`neon branch create --name dev/yourname`) and sets `DATABASE_URL` in `.env`.
 - Because BetterAuth auth tables live in the same Neon DB, auth users are isolated per branch automatically.
 
 ## Auth & Access Control
