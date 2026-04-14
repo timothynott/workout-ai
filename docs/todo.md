@@ -45,7 +45,7 @@
 - [x] Add `actions/cache` to deploy workflow to cache `.next/cache` between CI runs for faster builds
 - [x] Add test framework: install Vitest, configure for Next.js + Cloudflare Workers environment, add `pnpm test` script, add test step to GitHub Actions deploy workflow
 - [ ] Write Phase 1 blog posts
-  - [ ] Project overview (`content/posts/project-overview.mdx`)
+  - [x] Project overview (`content/posts/project-overview.mdx`)
   - [ ] Phase 1 overview (`content/posts/phase-1-scaffold.mdx`)
   - [ ] Next.js on Cloudflare Workers + OpenNext (`content/posts/cloudflare-workers-opennext.mdx`)
   - [ ] Why I left Neon Auth for BetterAuth (`content/posts/neon-auth-to-betterauth.mdx`)
