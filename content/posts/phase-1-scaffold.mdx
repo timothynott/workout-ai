@@ -1,32 +1,58 @@
 ---
 title: "Phase 1: Scaffolding an AI Workout App on Cloudflare Workers"
-date: "2026-04-08"
+date: "2026-04-13"
 description: "Every decision made setting up the scaffold — hosting, auth, database, AI, structure, and tooling."
-draft: true
+draft: false
 ---
 
-<!-- ~80 words: Open with what Phase 1 covers — the full scaffold before any real features. Name the constraint that shaped most of the decisions: everything has to run on Cloudflare Workers' edge runtime. -->
+They say, "Necessity is the mother of invention."" I prefer, "Constraints are the calling card of creativity."
+
+CloudFlare Workers are a cool offering that I'm excited to be investigating, but they presented quite a few 
+issues in scaffolding our project. We started with Neon Auth and moved to Better Auth. We started with an 
+`fs`-driven blog content repository and had to move to a PWA manifest-based one. The non-Node, no-filesystem
+experience is full of surprises!
 
 ## Hosting
 
-<!-- ~80 words: Next.js on Cloudflare Workers via OpenNext. Workers over Pages — the recommendation changed. `@cloudflare/next-on-pages` is deprecated. Full App Router support required the Node.js compat layer only Workers provides. Link to the deep dive: [Next.js on Cloudflare Workers](/blog/cloudflare-workers-opennext). -->
+I discussed this in the [initial post](./project-overview), but there was some initial confusion between 
+myself and Claude about whether we should be using Pages or Workers. We soon got that sorted and investigated
+how ephemeral Workers would operate. I'm accustomed to how Pages handles this (automatically), but there's
+a tiny bit more to it with Workers. Not a big deal, and GitHub actions are a solid means by which to manage
+things. We'll explore this some more in a future post.
 
 ## Auth
 
-<!-- ~80 words: Self-hosted BetterAuth with a Neon Postgres adapter. Started with Neon Auth — hit an edge-incompatible `crypto` dependency in its middleware that OpenNext couldn't work around. Switched to self-hosted. Unexpected bonus: branch-level auth isolation for free. Link to the deep dive: [Why I Left Neon Auth](/blog/neon-auth-to-betterauth). -->
+The Neon Auth to BetterAuth move was driven by the edge computing issues. But, I have to admit, I didn't 
+hate rolling my own here. Expet a deeper dive on BetterAuth soon!
 
 ## Database & ORM
 
-<!-- ~80 words: Neon Postgres with Drizzle ORM. Neon was already required for auth. Drizzle over Prisma because Drizzle is edge-native — no binary query engine, no code gen step, small bundle. Neon's branch-per-environment strategy means preview deploys never touch production data. -->
+My boss at the day job is a big fan of the Drizzle hype war with Prisma, so I thought I would check it out.
+It's delightful that they knocked out a TypeScript query engine, but I really want to dive into 
+performance metrics at some point. Not having to load the Prisma binary into memory gives Drizzle an 
+initial edge, but it's not hard to imagine how that binary might smoke JS over the lifetime of a serverless
+instance.
+
+Neon is a no-brainer. It will be interesting to see how costs scale if this app actually gets usage. But, 
+I'll be happy to pay a success tax.
 
 ## AI
 
-<!-- ~80 words: Vercel AI SDK as a model-agnostic abstraction over Claude, OpenAI, and Google. Users supply their own API key at onboarding — no server-side AI secrets, costs go to your own account. Key encrypted at rest. Link to the deep dive: [AI Without Server-Side Keys](/blog/ai-user-supplied-keys). -->
+The whole concept of the app is that it will be AI-driven. The days of static logic in personalized 
+interactions are gone. The key decision here was to use the Vercel AI SDK as a model-provider abstraction
+and let users BYO model API key. Keeping that key safe will be a key bit of infrastructure code that 
+we'll get into later.
 
 ## Structure
 
-<!-- ~80 words: DDD module structure under `src/modules/` and `src/shared/`. Overkill for a personal project on paper, but clear boundaries mean you can find anything six months later. `src/app/` and `src/middleware.ts` stay as framework-required exceptions. Link to the deep dive: [Why I'm Using DDD on a Personal Project](/blog/ddd-nextjs). -->
+I have had brushes with DDD and Clean Code enthusiasts in the past. I wanted to try to "do it right" 
+and right out of the gate, so I spent some time with Claude building a Tessl (more below) tile to 
+help keep the codebase in line with the philosophy. Right out of the gate I had to make a compromise
+with orthodoxy. More to come in a future post.
 
 ## Tooling
 
-<!-- ~80 words: Tailwind + shadcn/ui for the UI. Tessl for agent context — registry skills keep Claude and Cursor from hallucinating deprecated APIs. Vitest for domain unit tests. GitHub Actions for deploy, preview workers per branch, and automatic cleanup on merge. ENCRYPTION_KEY and all auth secrets in Cloudflare Workers secrets. -->
+This is all pretty straightforward -- NextJS provides a lot out-of-the-box. I went with a pretty 
+standard Tailwind and shadcn/ui combination. The only stand out item is Tessl. After getting 
+inculcated with their product by listening to their podcast, I decided to taste the Kool Aid&reg;.
+I'm liking it so far.
