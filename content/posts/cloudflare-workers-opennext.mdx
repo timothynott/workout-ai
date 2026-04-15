@@ -1,24 +1,70 @@
 ---
 title: "Next.js on Cloudflare Workers: Why Pages Is the Wrong Choice Now"
-date: "2026-04-08"
+date: "2026-04-14"
 description: "Cloudflare Pages used to be the obvious target for Next.js. It isn't anymore — here's what changed and how OpenNext fills the gap."
-draft: true
+draft: false
 ---
 
-<!-- ~80 words: Open with the assumption you started with — Pages felt like the obvious choice for a Next.js deploy. Set up the pivot: you dug into the docs and found the recommendation had changed. -->
+I chose Next.js because we use it at work and as I come from a Vue/Nuxt background, I wanted to get some more 
+hands-on experience with React and NextJS. Claude and I decided to jump at Claude's suggestion of
+`@cloudflare/next-on-pages`.
 
 ## Why Pages Falls Short
 
-<!-- ~150 words: Pages only supports the Edge runtime, which means no Server Actions, limited middleware, no Image Optimization, and incomplete App Router support. The `@cloudflare/next-on-pages` adapter that powered it is now deprecated. Be specific about what you'd lose. -->
+Well, for starters, it's deprecated. That's not the foot I wanted to get off on. Turns out, I'm still in 
+deprecation purgatory by sticking with an implementation that uses `middleware.ts`, but at least the
+OpenNext approach is up to date and I'm on the latest version of Next.js.
+
+There are other shortcomings, as well, but they hardly bear mentioning given that the solution is a dead end.
 
 ## Workers Is the New Target
 
-<!-- ~150 words: Cloudflare now recommends Workers for Next.js because Workers has the Node.js compatibility layer that Pages lacks. The full App Router works. What that looks like in practice — wrangler.jsonc, the worker entry point, how routing works. -->
+CloudFlare now recommends Workers for Next.js and I'm OK with that. I lost the automated deploy branch 
+URLs, but that was pretty easy to replicate with GitHub actions -- and I was already deploying Neon branches 
+essentially the same way. 
+
+Workers has a Node.js compatibility layer. I'm not explicitly taking advantage of this, yet. But, Resend 
+uses `process.env`, which the layer makes available.
+
+Lots of Next.js internals require Node.js, so even if it wasn't for things *I* explicitly or implicitly want 
+to do, it's a requirement. So, we add the flag in `wrangler.jsonc`.
 
 ## OpenNext
 
-<!-- ~180 words: `@opennextjs/cloudflare` is the adapter that makes this work. Explain what it does — wraps the Next.js build output, adapts it for the Workers runtime. Why OpenNext over the alternatives. Mention the native adapter API that landed in Next.js 16.2 (March 2026) and what that means for the future. -->
+This is where the magic really happens right now. The OpenNext project was built to make an adjustment to 
+the build output of Next.js -- which was meant to run specifically on Vercel -- to allow it to run in other
+environments.
+
+Recently, Vercel adjusted Next.js in version 16.2 to introduce the adapterPath API. Vercel's own build 
+implements the API to make the built runtime operate smoothly in the Vercel environment. The OpenNext core 
+is getting updated to take advantage of this API, and Cloudflare's adapter can follow.
+
+What's crazy is how simple the implementaiton is. Check out `open-next.config.ts`. It's one line and it's
+responsible for rewriting the build. Crazy simple.
+
+
 
 ## The Build Process
 
-<!-- ~100 words: `pnpm cf:build` runs `opennextjs-cloudflare build`, then `wrangler deploy` ships it. One gotcha you hit or something that surprised you about the process. -->
+There were lots of little tweaks made to make the build process go smoothly. There are a total of 20 
+commits with labels related to `ci` with 7 of them being fixes. But, the categories of CI stuff
+we accomplished fall into these buckets:
+
+- deploy, name, clean up CF Workers
+- Neon database deployment and migrations
+- pnpm optimizations
+- GitHub actions and branch rules tweaks
+- secrets (SSSSSSHHH!)
+
+## How do I feel about it?
+
+Good. I would like not to be in limbo on the middleware.ts/proxy.ts issue. But, I'm willing to be 
+patient and see if it gets resolved before middleware.ts gets chopped. I learned a lot about how CF's
+edge operates and what limitations I am going to face as I go forward. 
+
+The big unexpected finding was that a simple blog was not so simple to implement. I'll probably spend
+some more time on how this is working and how I might optimize the process.
+
+I think the number one thing I'm wondering about is whether the choice to make this a PWA was the 
+correct one. It gives me the manifest, which powers the blog. But, it is technical overhead and 
+almost certainly premature optimization.
