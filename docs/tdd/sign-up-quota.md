@@ -86,8 +86,9 @@ direct Drizzle access via `@/shared/infrastructure/db`. Using Drizzle directly
 keeps the hook dependency narrow (just the schema's `user` table) and avoids
 coupling the quota logic to BetterAuth internals.
 
-- **Daily:** `count(*) FROM user WHERE created_at >= CURRENT_DATE` (UTC day —
-  matches Resend reporting, which is UTC-based).
+- **Daily (rolling 24 hours):** `count(*) FROM user WHERE created_at >= NOW() - INTERVAL '24 hours'`.
+  Avoids a dependency on Postgres `CURRENT_DATE`, which resolves against the
+  session's `timezone` setting rather than UTC.
 - **Monthly (rolling 31 days):** `count(*) FROM user WHERE created_at >= NOW() - INTERVAL '31 days'`.
   A rolling window is safer than a calendar month — it prevents a burst on the
   1st from blowing the budget before Resend's counter rolls over.
@@ -158,3 +159,7 @@ Each bullet below is one focused commit.
 ## Progress log
 
 - 2026-04-15 — Plan drafted. Starting implementation.
+- 2026-04-15 — Review feedback addressed: switched the daily window from
+  `CURRENT_DATE` to a rolling 24-hour interval (symmetric with the monthly
+  window, avoids Postgres session-timezone dependency) and added an inline
+  note in the hook acknowledging the check-then-insert race.
