@@ -1,0 +1,116 @@
+---
+title: "Phase 2: Gating Signups Against the Resend Quota"
+date: "2026-04-15"
+description: "A tiny hook, a big footgun: keeping a free-tier email quota from blowing up on the first viral day."
+draft: false
+---
+
+Every "send a verification email" in a signup flow is also a "spend one of
+your free-tier email credits." Resend's free plan gives you 100 emails a day
+and 3,000 a month, which is plenty for a project like this — right up until
+it isn't. A broken script, a rogue form submission loop, or (best case) a
+sudden spike of real interest can cash the quota out in a single afternoon,
+leaving actual users stuck at "verify your email" with nothing ever
+arriving.
+
+Phase 2 is the smallest possible piece of insurance against that: reject
+signup attempts before they spend an email when we're near the limit.
+
+## Where to put the gate
+
+The first instinct is to reach for a middleware — every request that looks
+like a signup gets inspected, counted, and allowed or denied. That works,
+but it's fragile. BetterAuth has several routes that culminate in a new user
+row: email+password signup, OAuth first-sign-in, and anything a plugin adds.
+Trying to enumerate and middleware all of them is a game of whack-a-mole.
+
+The right place is the choke point they all share: the database insert.
+BetterAuth exposes `databaseHooks.user.create.before` for exactly this —
+one hook, every code path, fires before the row exists (and therefore
+before the verification email goes out). Throw an `APIError` and the whole
+request tears down cleanly with a 429 and a message the UI already knows
+how to render.
+
+```ts
+databaseHooks: {
+  user: {
+    create: {
+      before: async (user) => {
+        const decision = await checkSignupQuota(signupCountPort);
+        if (!decision.allowed) {
+          throw new APIError("TOO_MANY_REQUESTS", {
+            code: QUOTA_ERROR_CODE[decision.reason],
+            message: QUOTA_ERROR_MESSAGE[decision.reason],
+          });
+        }
+        return { data: user };
+      },
+    },
+  },
+}
+```
+
+## Daily and monthly, and which one wins
+
+Two caps, because Resend has two: a hard 100/day and a softer 3,000/month.
+The daily query is `created_at >= CURRENT_DATE` in UTC, which matches how
+Resend reports its counters. The monthly one is `created_at >= NOW() - INTERVAL '31 days'`
+— a rolling window rather than a calendar month, so a surge on the 1st
+can't drain the budget before the real reset.
+
+When both caps trip, the daily message wins. "Try again tomorrow" is a
+useful thing to tell a user; "try again next month" is mostly frustrating.
+The distinction doesn't matter most of the time, but when it does, you
+want the hopeful one.
+
+## The testability shape
+
+The hook itself is a two-line call into an application function. That
+function — `checkSignupQuota` — takes a `SignupCountPort` with exactly
+the methods it needs (`countSinceStartOfDay`, `countLastMonth`) and
+returns a decision object. The Neon-backed implementation of that port
+lives in the adapter next to the hook; the tests mock it with two numbers
+and assert the decision. No Drizzle, no schema, no fake database in the
+unit suite.
+
+This is the payoff of the DDD shape I set up in Phase 1. The domain file
+(constants and error codes) has zero imports from infrastructure. The
+application file takes its dependency as an argument. The adapter file
+is the only place where BetterAuth, Drizzle, and Neon meet the rest of
+the codebase — and when it changes, the tests don't care.
+
+## Surfacing the error in the UI
+
+The signup UI is `@daveyplate/better-auth-ui`'s `SignUpForm`. Its error
+renderer, `getLocalizedError`, reads `error.error.code`, looks it up in
+the `AuthUIProvider`'s `localization` map, and falls back to
+`error.error.message` if there's no match.
+
+I originally planned to register `DAILY_LIMIT` / `MONTHLY_LIMIT` in that
+map for project-owned copy. But the library's `localization` type is a
+closed union of known auth error keys — my custom codes don't type-check
+there. The fallback does exactly what I needed anyway: render the
+friendly message that the server already supplies. The hook owns the
+copy, the UI renders it, no component needed forking.
+
+There's an ADR-shaped observation in that: the single-source-of-truth for
+"what we tell the user when they hit the quota" is the domain file. If
+the wording ever needs to change, it changes there, in one place, and
+every path — API response, UI render, log line — picks it up.
+
+## Lessons
+
+- **Hook at the invariant, not the request.** One `before` hook on the
+  insert is worth three middlewares on three routes.
+- **Rolling windows beat calendar windows** for quota protection — they
+  stay aligned with the provider's counter instead of racing the clock.
+- **Keep the policy out of the adapter.** The application function is
+  dependency-free and trivial to unit-test; the Drizzle query is the
+  only thing that needed a real database to exercise end-to-end.
+- **Trust the fallback.** When a library already does the right thing
+  with the data you have, resist the urge to wire in a fancier path
+  just because one exists.
+
+Next up in Phase 3: onboarding, where the user hands us a provider,
+a model ID, and an API key we promised to encrypt at rest. See you
+there.
