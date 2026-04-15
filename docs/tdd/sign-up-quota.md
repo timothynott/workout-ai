@@ -110,22 +110,15 @@ throw new APIError("TOO_MANY_REQUESTS", {
 
 ## Client UX
 
-`AuthUIProvider` in `src/app/providers.tsx` already wraps the signup view.
-Adding a `localization` prop lets us map our error codes to curated copy
-without forking the library's `SignUpForm`:
-
-```tsx
-<AuthUIProvider
-  …
-  localization={{
-    DAILY_LIMIT: "We've hit today's signup limit. Please try again tomorrow.",
-    MONTHLY_LIMIT: "Signups are paused for this month. Please try again next month.",
-  }}
->
-```
-
-`getLocalizedError` already checks `error.error.code`, so the mapping wires up
-without further component work.
+`AuthUIProvider` in `src/app/providers.tsx` already wraps the signup view. Its
+`getLocalizedError` helper reads `error.error.code`, looks the code up in the
+`localization` prop (typed as `Partial<AuthLocalization>`, a closed set of
+library-known keys), and falls back to `error.error.message` when there's no
+match. Since custom project codes like `DAILY_LIMIT` aren't in that union, a
+`localization` override doesn't type-check — but the fallback path does
+exactly what we want: render the friendly `message` the hook already
+supplies. No client component change is needed; the copy lives server-side
+in `domain/quota.ts` and flows through the fallback automatically.
 
 ## Testing strategy
 
