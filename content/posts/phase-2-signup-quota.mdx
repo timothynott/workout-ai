@@ -15,6 +15,8 @@ draft: true
 
 - Middleware per route is fragile — multiple signup paths (email+password, OAuth, plugins)
 - BetterAuth `databaseHooks.user.create.before` — single hook, all code paths, fires before insert and before verification email
+- OAuth users arrive with `emailVerified: true` — BetterAuth trusts Google's verification, no email is sent, so they exit the hook immediately and don't count against quota
+- Count queries join `account` on `provider_id = 'credential'` — only email+password rows are tallied
 - Throw `APIError("TOO_MANY_REQUESTS")` to reject cleanly with 429
 
 ## Query design

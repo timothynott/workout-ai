@@ -14,10 +14,13 @@ encountering a generic failure.
 
 ## Scope
 
-Applies to every path that creates a BetterAuth `user` row — email+password
-signup **and** Google OAuth first-time sign-in — because both trigger a row
-insert in the `user` table and the latter also dispatches a verification email
-the first time the user signs in.
+Applies to **email+password signups only**. Google OAuth first-time sign-ins
+also insert a `user` row, but BetterAuth trusts Google's email verification and
+never calls `sendVerificationEmail` for OAuth users — they don't consume Resend
+quota. The `before` hook exits early when `user.emailVerified` is `true`
+(the OAuth signal), and the count queries are filtered to
+`account.provider_id = 'credential'` so historical OAuth rows don't inflate
+the tally.
 
 ## Out of scope
 
@@ -28,14 +31,18 @@ the first time the user signs in.
 ## Architecture
 
 ```
-POST /api/auth/sign-up/email       ┐
-POST /api/auth/callback/google     ┘
+POST /api/auth/sign-up/email
         │
         ▼
 BetterAuth `databaseHooks.user.create.before`
         │
+        ├─ user.emailVerified = true (OAuth) → pass through immediately
+        │
         ▼
-checkSignupQuota(db)   ──► SELECT COUNT(*) FROM user WHERE created_at ≥ …
+checkSignupQuota(db)   ──► SELECT COUNT(*) FROM user
+                           JOIN account ON account.user_id = user.id
+                           WHERE account.provider_id = 'credential'
+                           AND user.created_at ≥ …
         │
         ├─ allowed  → return { data: user } (hook passes user through unchanged)
         └─ blocked  → throw APIError("TOO_MANY_REQUESTS",
@@ -86,10 +93,14 @@ direct Drizzle access via `@/shared/infrastructure/db`. Using Drizzle directly
 keeps the hook dependency narrow (just the schema's `user` table) and avoids
 coupling the quota logic to BetterAuth internals.
 
-- **Daily (rolling 24 hours):** `count(*) FROM user WHERE created_at >= NOW() - INTERVAL '24 hours'`.
+Both queries join `user` with `account` on `userId` and filter to
+`account.provider_id = 'credential'` so only email+password signups — the ones
+that actually send a verification email — are counted against the quota.
+
+- **Daily (rolling 24 hours):** `count(*) … WHERE created_at >= NOW() - INTERVAL '24 hours'`.
   Avoids a dependency on Postgres `CURRENT_DATE`, which resolves against the
   session's `timezone` setting rather than UTC.
-- **Monthly (rolling 31 days):** `count(*) FROM user WHERE created_at >= NOW() - INTERVAL '31 days'`.
+- **Monthly (rolling 31 days):** `count(*) … WHERE created_at >= NOW() - INTERVAL '31 days'`.
   A rolling window is safer than a calendar month — it prevents a burst on the
   1st from blowing the budget before Resend's counter rolls over.
 

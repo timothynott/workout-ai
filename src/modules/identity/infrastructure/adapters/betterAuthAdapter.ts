@@ -3,7 +3,7 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { cloudflare } from 'better-auth-cloudflare';
 import { APIError } from 'better-auth/api';
 import { Resend } from 'resend';
-import { count, gte, sql } from 'drizzle-orm';
+import { and, count, eq, gte, sql } from 'drizzle-orm';
 import { db } from '@/shared/infrastructure/db';
 import { checkSignupQuota } from '@/modules/identity/application/checkSignupQuota';
 import {
@@ -18,17 +18,31 @@ const signupCountPort = {
     // Rolling 24-hour window (not `CURRENT_DATE`, which is session-timezone
     // dependent) — keeps the quota math independent of whatever Neon's
     // per-connection TZ happens to be set to.
+    // Filtered to `credential` provider: OAuth signups don't send a
+    // verification email and don't consume Resend quota.
     const [row] = await db
       .select({ n: count() })
       .from(schema.user)
-      .where(gte(schema.user.createdAt, sql`NOW() - INTERVAL '24 hours'`));
+      .innerJoin(schema.account, eq(schema.account.userId, schema.user.id))
+      .where(
+        and(
+          eq(schema.account.providerId, 'credential'),
+          gte(schema.user.createdAt, sql`NOW() - INTERVAL '24 hours'`),
+        ),
+      );
     return row?.n ?? 0;
   },
   async countLastMonth() {
     const [row] = await db
       .select({ n: count() })
       .from(schema.user)
-      .where(gte(schema.user.createdAt, sql`NOW() - INTERVAL '31 days'`));
+      .innerJoin(schema.account, eq(schema.account.userId, schema.user.id))
+      .where(
+        and(
+          eq(schema.account.providerId, 'credential'),
+          gte(schema.user.createdAt, sql`NOW() - INTERVAL '31 days'`),
+        ),
+      );
     return row?.n ?? 0;
   },
 };
@@ -47,6 +61,10 @@ export const auth = betterAuth({
         // overshot by ~(concurrency - 1). Acceptable because Resend enforces
         // its own hard cap; we don't need a transaction or advisory lock here.
         before: async (user) => {
+          // OAuth users arrive with emailVerified: true — no verification email
+          // is sent, so they don't consume Resend quota. Skip the gate entirely.
+          if (user.emailVerified) return { data: user };
+
           const decision = await checkSignupQuota(signupCountPort);
           if (!decision.allowed) {
             throw new APIError('TOO_MANY_REQUESTS', {
