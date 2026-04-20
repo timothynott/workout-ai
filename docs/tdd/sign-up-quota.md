@@ -165,7 +165,7 @@ Each bullet below is one focused commit.
 - [x] **feat(ui):** add quota-error localization to `AuthUIProvider` in `providers.tsx`.
 - [x] **docs(blog):** publish Phase 2 blog post.
 - [x] **chore(todo):** mark Phase 2 items complete in `docs/todo.md`.
-- [ ] **PR:** push branch, open PR to `staging`, assign reviewer.
+- [x] **PR:** push branch, open PR to `staging`, assign reviewer.
 
 ## Progress log
 
