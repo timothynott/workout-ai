@@ -53,11 +53,11 @@
   - [ ] AI without server-side keys (`content/posts/ai-user-supplied-keys.mdx`)
 
 ## Phase 2 — Signup Quota Gating
-- [ ] Create `lib/quota.ts` with `QUOTA` constants: `daily` (100) and `monthly` (3000) — update here when upgrading Resend plan
-- [ ] Create `lib/quota-check.ts` with `checkSignupQuota`: queries BetterAuth `user` table for counts since `CURRENT_DATE` (daily) and `NOW() - INTERVAL '31 days'` (monthly), returns `{ allowed, reason }`
-- [ ] Add BetterAuth `before` hook on user creation in `lib/auth/index.ts`: call `checkSignupQuota`, throw if limit exceeded with `error_code` and `error_message`
-- [ ] Update signup UI to surface quota error codes (`daily_limit`, `monthly_limit`) with user-friendly messaging
-- [ ] Write Phase 2 blog post: quota gating design, webhook approach, and lessons learned
+- [x] Create `modules/identity/domain/quota.ts` with `QUOTA` constants: `daily` (100) and `monthly` (3000) — update here when upgrading Resend plan _(moved under the identity module as part of the Phase 1 DDD migration; originally listed at `lib/quota.ts`)_
+- [x] Create `modules/identity/application/checkSignupQuota.ts` with `checkSignupQuota`: queries BetterAuth `user` table for counts since `CURRENT_DATE` (daily) and `NOW() - INTERVAL '31 days'` (monthly), returns `{ allowed, reason }`
+- [x] Add BetterAuth `before` hook on user creation in `modules/identity/infrastructure/adapters/betterAuthAdapter.ts`: call `checkSignupQuota`, throw if limit exceeded with `error_code` and `error_message`
+- [x] Update signup UI to surface quota error codes (`daily_limit`, `monthly_limit`) with user-friendly messaging _(server-provided message renders via `getLocalizedError` fallback — see TDD note at `docs/tdd/sign-up-quota.md`)_
+- [x] Write Phase 2 blog post: quota gating design, webhook approach, and lessons learned
 
 ## Phase 3 — Onboarding
 - [ ] Add encryption/decryption utility for sensitive fields (`/lib/crypto.ts`, AES-256-GCM, key from `ENCRYPTION_KEY` secret)

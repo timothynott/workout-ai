@@ -11,6 +11,10 @@ export function Providers({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   return (
+    // Signup quota errors (DAILY_LIMIT / MONTHLY_LIMIT, see ADR-014) are
+    // surfaced by the SignUpForm via getLocalizedError, which falls back to
+    // error.error.message — the BetterAuth hook already provides friendly
+    // copy, so no localization override is needed here.
     <AuthUIProvider
       authClient={authClient}
       navigate={router.push}

@@ -1,0 +1,52 @@
+---
+title: "Phase 2: Gating Signups Against the Resend Quota"
+date: "2026-04-15"
+description: "Keeping a free-tier email quota from blowing up on the first viral day."
+draft: true
+---
+
+## Problem
+
+- Resend free tier: 100 emails/day, 3,000/month
+- Every signup sends a verification email — rogue loop or traffic spike can exhaust quota
+- Real users left stuck at "verify your email" with nothing arriving
+
+## Where to put the gate
+
+- Middleware per route is fragile — multiple signup paths (email+password, OAuth, plugins)
+- BetterAuth `databaseHooks.user.create.before` — single hook, all code paths, fires before insert and before verification email
+- OAuth users arrive with `emailVerified: true` — BetterAuth trusts Google's verification, no email is sent, so they exit the hook immediately and don't count against quota
+- Count queries join `account` on `provider_id = 'credential'` — only email+password rows are tallied
+- Throw `APIError("TOO_MANY_REQUESTS")` to reject cleanly with 429
+
+## Query design
+
+- Daily: rolling 24-hour window (`NOW() - INTERVAL '24 hours'`) — avoids Postgres session-timezone dependency on `CURRENT_DATE`
+- Monthly: rolling 31-day window (`NOW() - INTERVAL '31 days'`) — safer than calendar month
+- Daily cap takes precedence when both trip — "try again tomorrow" > "try again next month"
+
+## Testability
+
+- `checkSignupQuota` takes a `SignupCountPort` interface — pure function, no Drizzle/Neon in tests
+- Neon-backed port implementation lives in the adapter alongside the hook
+- Domain file (constants, error codes) has zero infrastructure imports — DDD payoff from Phase 1
+
+## UI error surfacing
+
+- `@daveyplate/better-auth-ui` `getLocalizedError` falls back to `error.error.message`
+- Planned to use `localization` prop override — but it's a closed union, custom codes don't type-check
+- Server-provided message flows through the fallback path — no component change needed
+- Single source of truth for user-facing copy is `domain/quota.ts`
+
+## Race condition
+
+- Check-then-insert: parallel requests can each pass before any has inserted
+- Bounded by Worker concurrency — Resend enforces its own hard cap as backstop
+- Not worth a transaction/advisory lock for v1
+
+## Lessons
+
+- Hook at the invariant (DB insert), not the request (route middleware)
+- Rolling windows > calendar windows for quota alignment with provider reporting
+- Keep policy out of the adapter — application function stays unit-testable
+- Trust the library's fallback when it already does the right thing

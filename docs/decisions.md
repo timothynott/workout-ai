@@ -3,7 +3,7 @@
 ## ADR-014: Signup Quota Gating — BetterAuth `before` Hook
 **Status:** Accepted (updated — migrated from Neon Auth webhook)
 
-Signups are rate-limited to protect Resend's free-tier email quota. A BetterAuth `before` hook on user creation queries the BetterAuth `user` table for daily and monthly signup counts and rejects the request if either limit is exceeded.
+Email+password signups are rate-limited to protect Resend's free-tier email quota. A BetterAuth `before` hook on user creation skips OAuth users (who arrive with `emailVerified: true` and never trigger a verification email) and queries the `user`+`account` tables — filtered to `account.provider_id = 'credential'` — for daily and monthly email signup counts, rejecting the request if either limit is exceeded.
 
 Quota constants live in `lib/quota.ts` (`daily: 100`, `monthly: 3000`) so limits can be updated in one place when the Resend plan changes. Error codes (`daily_limit`, `monthly_limit`) are surfaced to the user in the signup UI.
 
